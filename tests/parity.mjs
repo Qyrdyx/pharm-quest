@@ -45,7 +45,7 @@ const ADDED_OK = new Set([
   "连击特效", "不要特效", "低（只有文字）", "中", "高", "开着", "关掉", "特效“中”是推荐强度；“高”在“中”的基础上加了逐字闪光的大字、更多粒子、第二圈光环、更明显的震动和更多全对彩带。省电模式最多到“中”，系统开了“减少动画”最多到“低”。屏幕震动只在连击升档时出现，容易头晕可以单独关掉，其他特效照常。关闭成就后不再弹解锁提示和新闪卡，已有记录保留，重新打开就能接着用。", "屏幕震动", "Combo effects", "No effects", "Low (text only)", "Medium", "High", "Achievements & collection", "Enabled", "Disabled", "Medium is recommended. High adds letter-by-letter shining words, more particles, a second ring, stronger shake and more confetti. Power saving caps it at Medium; the system \"reduce motion\" setting caps it at Low. Screen shake only happens on combo tier-ups — turn it off if it makes you dizzy; other effects stay. Turning achievements off stops unlock banners and card reveals; existing records are kept.", "Screen shake"
 ,
   // 设置：下架歌曲后的曲目分组数量、出错记录（版本号变了这里也要改）
-  "5 首", "★ 2 5 首", "6 首", "出错记录", "软件出错时自动记下来，遇到问题可以复制发给作者。 版本 1.6.1 · 2026-11-20 · 没有记录", "查看出错记录", "5 tracks", "★ 2 5 tracks", "6 tracks", "Error log", "Errors are recorded automatically; copy and send them to the author if something breaks. Version 1.6.1 · 2026-11-20 · none", "View error log"
+  "5 首", "★ 2 5 首", "6 首", "出错记录", "软件出错时自动记下来，遇到问题可以复制发给作者。 版本 1.6.2 · 2026-11-21 · 没有记录", "查看出错记录", "5 tracks", "★ 2 5 tracks", "6 tracks", "Error log", "Errors are recorded automatically; copy and send them to the author if something breaks. Version 1.6.2 · 2026-11-21 · none", "View error log"
 ]);
 /* 拆分之后有意删掉的内容（2026-11-18 下架有版权的曲目）：比对前从拆分前的版本里去掉这些整行 */
 const REMOVED_OK = new Set(["★ 3 8 首", "★ 4 7 首", "★ 1 7 首", "★ 3 8 tracks", "★ 4 7 tracks", "★ 1 7 tracks"]);

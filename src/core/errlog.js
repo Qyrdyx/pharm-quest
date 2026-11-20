@@ -8,7 +8,7 @@ import { LS } from "./storage.js";
 reg({ APP_VERSION: () => APP_VERSION, logErr: () => logErr, errLog: () => errLog, clearErrLog: () => clearErrLog, errReport: () => errReport });
 
 /* 版本号：每次发布新版改这里（出错记录、设置页会显示） */
-export const APP_VERSION = "1.6.1 · 2026-11-20";
+export const APP_VERSION = "1.6.2 · 2026-11-21";
 const MAX = 50;
 export const errLog = () => { const v = LS.get("errlog", []); return Array.isArray(v) ? v : []; };
 export function clearErrLog() { LS.set("errlog", []); }

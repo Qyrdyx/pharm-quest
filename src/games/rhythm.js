@@ -110,31 +110,43 @@ export function rhythmHub() {
 const main = () => document.querySelector("#main");
 
 /* ---------- 校准：跟着“嗒”点 8 下 ---------- */
+/* 校准：12 下“嗒”，每一拍只记第一下；漏几下、晚开始都没关系，嗒声放完后自动出结果（记到 6 下以上就算）。
+ * 以前要求正好点满 8 下才结束：漏一下、晚开始或者蓝牙耳机延迟大让最后一下落到范围外，就一直停在一半，没有任何提示。 */
+const CAL_N = 12, CAL_MIN = 6;
 export function rhythmCal() {
   enterMode();
-  let run = null; const taps = [];
+  let run = null, endTimer = 0; const taps = new Map();   // 拍号 → 偏差（秒）
   show(`<div class="rh-calpage"><div class="eyebrow">${TT("摇滚医生", "Rock Doctor")}</div><h2>${TT("延迟校准", "Latency calibration")}</h2>
-    <p>${TT("点“开始”后会先响 2 下预备，接着每一下“嗒”的时候点一下下面的大按钮（或按空格 / 任意方向键），一共 8 下。软件会算出这台设备从出声到你按下的平均延迟，以后自动扣掉。", "After Start you'll hear 2 lead-in clicks. Then tap the big button (or press Space / any arrow) on each click, 8 times. The average delay is subtracted automatically from then on.")}</p>
+    <p>${TT("点“开始”后会先响 2 下预备，接着每一下“嗒”的时候点一下下面的大按钮（或按空格 / 任意方向键），一共 12 下；漏掉几下没关系，记到 6 下以上就能算出结果。软件会算出这台设备从出声到你按下的平均延迟，以后自动扣掉。", "After Start you'll hear 2 lead-in clicks. Then tap the big button (or press Space / any arrow) on each click — 12 in all; missing a few is fine, 6 are enough. The average delay is subtracted automatically from then on.")}</p>
     <button class="rh-pad" id="rhPad">${TT("跟着“嗒”点这里", "Tap here on each click")}</button>
-    <div class="rh-dots" id="rhDots">${Array.from({ length: 8 }, () => "<i></i>").join("")}</div>
+    <div class="rh-dots" id="rhDots">${Array.from({ length: CAL_N }, () => "<i></i>").join("")}</div>
     <p class="rh-calres" id="rhRes">${typeof cfg.rhythmCal === "number" ? TT(`当前：${Math.round(cfg.rhythmCal * 1000)} 毫秒`, `Current: ${Math.round(cfg.rhythmCal * 1000)} ms`) : ""}</p>
     <div class="io-row"><button class="btn" id="rhGo">${TT("开始", "Start")}</button><button class="ibtn" id="rhMinus">−10 ms</button><button class="ibtn" id="rhPlus">+10 ms</button><button class="btn ghost" id="rhBack">${TT("返回", "Back")}</button></div></div>`,
   () => {
     const res = $("#rhRes"), dots = [...document.querySelectorAll("#rhDots i")];
-    const tap = perf => { if (!run) return; const th = heardAt(perf), k = Math.round((th - run.t0) / run.beat); if (k < 0 || k > 7) return;
-      taps.push(th - (run.t0 + k * run.beat)); if (dots[taps.length - 1]) dots[taps.length - 1].classList.add("on"); $("#rhPad").classList.remove("hit"); void $("#rhPad").offsetWidth; $("#rhPad").classList.add("hit");
-      if (taps.length >= 8) finish(); };
-    const finish = () => { const d = taps.slice(2).sort((a, b) => a - b), med = d[Math.floor(d.length / 2)];   // 去掉前两下（还没跟上节奏），取中位数
-      run = null; if (!d.length || Math.abs(med) > 0.4) { res.textContent = TT("差得太多了，可能没跟上节奏，再试一次", "Too far off — try again"); return; }
+    const go = $("#rhGo"), goText = go.textContent;
+    const tap = perf => { if (!run) return;
+      $("#rhPad").classList.remove("hit"); void $("#rhPad").offsetWidth; $("#rhPad").classList.add("hit");
+      /* 归到哪一拍：允许比这一拍早 0.3 拍、晚 0.7 拍（蓝牙耳机延迟大也能对上），每拍只记第一下 */
+      const th = heardAt(perf), k = Math.floor((th - run.t0) / run.beat + 0.3); if (k < 0 || k >= CAL_N || taps.has(k)) return;
+      taps.set(k, th - (run.t0 + k * run.beat)); if (dots[k]) dots[k].classList.add("on");
+      if (taps.size >= CAL_N - 2) finish(); };   // 点到 10 下就可以提前出结果
+    const finish = () => { clearTimeout(endTimer); go.disabled = false; go.textContent = goText;
+      const all = [...taps.entries()], use = (all.filter(([k]) => k >= 2).length >= CAL_MIN ? all.filter(([k]) => k >= 2) : all).map(([, v]) => v).sort((a, b) => a - b), med = use[Math.floor(use.length / 2)];   // 尽量去掉前两拍（还没跟上节奏），取中位数
+      run = null;
+      if (taps.size < CAL_MIN) { res.textContent = TT(`只记到 ${taps.size} 下，至少要 ${CAL_MIN} 下。点“开始”再来一次，跟着“嗒”点就行`, `Only ${taps.size} taps recorded — at least ${CAL_MIN} are needed. Press Start to try again.`); return; }
+      if (Math.abs(med) > 0.4) { res.textContent = TT("差得太多了，可能没跟上节奏，再试一次", "Too far off — try again"); return; }
       cfg.rhythmCal = Math.round(med * 1000) / 1000; save(); { const st = RS(); st.calDone = true; RS_SAVE(st); const g = rhAchCheck({ maxStreak: 0, score: 0 }); g.forEach(a => toast(TT("🎸 摇滚医生成就：", "🎸 Rock Doctor: ") + achName(a), 3200)); } res.textContent = TT(`校准好了：${Math.round(med * 1000)} 毫秒`, `Calibrated: ${Math.round(med * 1000)} ms`); SFX.pick(); };
     $("#rhPad").addEventListener("pointerdown", e => { e.preventDefault(); tap(e.timeStamp); });
     const onKey = e => { if (e.repeat) return; if ([" ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(e.key)) { e.preventDefault(); tap(e.timeStamp); } };
     addEventListener("keydown", onKey);
-    $("#rhGo").onclick = () => { taps.length = 0; dots.forEach(x => x.classList.remove("on")); res.textContent = ""; run = rhyClicks(8, 100); };
+    go.onclick = () => { if (run) return; taps.clear(); dots.forEach(x => x.classList.remove("on")); res.textContent = ""; run = rhyClicks(CAL_N, 100); if (!run) { res.textContent = TT("这台设备没法播放声音", "Audio isn't available on this device"); return; }
+      go.disabled = true; go.textContent = TT("进行中…", "Listening…");
+      clearTimeout(endTimer); endTimer = setTimeout(() => { if (run) finish(); }, (run.t0 - AU.ctx.currentTime + CAL_N * run.beat + 0.9) * 1000); };   // 嗒声放完自动出结果，不会卡在一半
     const nudge = v => { cfg.rhythmCal = Math.round(((typeof cfg.rhythmCal === "number" ? cfg.rhythmCal : 0.03) + v) * 1000) / 1000; save(); res.textContent = TT(`当前：${Math.round(cfg.rhythmCal * 1000)} 毫秒`, `Current: ${Math.round(cfg.rhythmCal * 1000)} ms`); SFX.click(); };
     $("#rhMinus").onclick = () => nudge(-0.01); $("#rhPlus").onclick = () => nudge(0.01);
     $("#rhBack").onclick = () => { SFX.click(); PG.__rhNext = true; PG.rhythmHub(); };
-    PG.cleanup = () => { removeEventListener("keydown", onKey); rhyStop(true); if (!PG.__rhNext) leaveMode(); PG.__rhNext = false; };
+    PG.cleanup = () => { clearTimeout(endTimer); removeEventListener("keydown", onKey); rhyStop(true); if (!PG.__rhNext) leaveMode(); PG.__rhNext = false; };
   });
 }
 
