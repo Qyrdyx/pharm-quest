@@ -1,4 +1,8 @@
-# 药理闯关
+# 药理闯关 · PharmQuest
+
+> **English** — A dental pharmacology study game for students: 186 drugs in 53 memory groups, played through ward-round quizzes, pill sorting, name / mechanism matching, clinical cases, spelling, class comparisons, Latin prescription writing and a rhythm game (Rock Doctor). Works fully offline as a single HTML file; bilingual UI (Chinese / English).
+> **Play online:** https://qyrdyx.github.io/pharm-quest/ (add it to your home screen to use offline) · **Download:** [Releases](https://github.com/Qyrdyx/pharm-quest/releases)
+> Content follows the course lecture notes; where they differ, the lecture notes take precedence.
 
 按“药物组”闯关的口腔药理学记忆游戏：186 种药、53 个记忆单元。
 玩法有查房问答、药柜分拣、连线配对（含三合一）、病例诊室、中英默写、同类药物辨析、错题专练、AI 出题；
