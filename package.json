@@ -1,0 +1,20 @@
+{
+  "name": "pharm-quest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "药理闯关：按药物组闯关的口腔药理学记忆游戏",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/dev.mjs",
+    "build": "node tools/build.mjs",
+    "build:desktop": "node tools/build.mjs --desktop",
+    "test": "node tests/run.mjs",
+    "build:dev": "node tools/build.mjs --dev --desktop"
+  },
+  "devDependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4",
+    "esbuild": "^0.24.2",
+    "eslint-scope": "^8.2.0"
+  }
+}

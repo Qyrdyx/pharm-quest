@@ -1,0 +1,12 @@
+/* ——— result ——— */
+.result{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding-top:10px}
+.result .mascot{width:140px}
+.stars{display:flex;gap:10px;font-size:40px;line-height:1}
+.stars span{color:var(--bench-2);transition:color .3s}
+.stars span.on{color:var(--cap-amber);animation:pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.result .score{font-family:var(--f-mono);font-size:54px;font-weight:700;line-height:1}
+.result .meta{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;color:var(--mute);font-size:14px}
+.result .meta b{font-family:var(--f-mono);color:var(--paper)}
+.result .newbest{font-family:var(--f-display);color:var(--cap-amber);font-size:20px}
+.wronglist{width:100%;max-width:720px;text-align:left;margin-top:10px}
+

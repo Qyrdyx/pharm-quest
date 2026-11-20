@@ -1,0 +1,65 @@
+/* 布局：一张深色“药理实验台”，胶囊配色作为强调；单一深色主题（游戏世界观） */
+:root{
+  --ink:#0c1f26; --bench:#123039; --bench-2:#183d48; --line:#285864;
+  --paper:#eef4ef; --mute:#93b3b4; --faint:#5f8389;
+  --cap-red:#ef6a52; --cap-amber:#f4bf4f; --cap-cream:#f7ecd9;
+  --mint:#5fd6a8; --rose:#ff6b81; --sky:#86cbff;
+  --outline:#0a1a20;
+  --f-display:"ZCOOL KuaiLe","Nunito","Noto Sans SC",sans-serif;
+  --f-body:"Nunito","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:14px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:15px;line-height:1.55;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--ink)}
+canvas#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+body.eco-deco .mascot .m-body,body.eco-deco .mascot .eyes-n,body.eco-deco .ibtn.on .eq i,body.eco-deco .patient .lampbeam,body.eco-deco .patient .spk{animation:none!important}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none}
+#app{position:relative;z-index:1;min-height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,a,summary,input,select,textarea,label,.cover,.drawer,.tile,.hcell{touch-action:manipulation}
+@media (pointer:coarse){.search:not(.spell-in),input[type=search],textarea{font-size:16px !important}}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--cap-amber);outline-offset:2px}
+.wrap{width:100%;max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.topbar{position:sticky;top:0;padding-top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--ink) 96%,transparent);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
+.logo{flex:none;white-space:nowrap;display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:22px;letter-spacing:.04em}
+.logo .pill-ico{width:30px;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--cap-red) 50%,var(--cap-cream) 50%);transform:rotate(-30deg);box-shadow:0 0 0 2px var(--outline)}
+.logo small{font-family:var(--f-mono);font-size:11px;color:var(--mute);letter-spacing:0}
+.spacer{flex:1}
+.ibtn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:19px;background:var(--bench);border:1px solid var(--line);font-size:13px;font-weight:800;transition:transform .15s,background .15s}
+@media (hover:hover){.ibtn:hover{background:var(--bench-2)}}
+.ibtn:active{transform:scale(.95)}
+.ibtn svg{width:18px;height:18px}
+.ibtn.on{border-color:var(--mint);color:var(--mint)}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+.eq i{width:3px;background:currentColor;border-radius:2px;height:4px}
+.ibtn.on .eq i{animation:eq .9s ease-in-out infinite}
+.ibtn.on .eq i:nth-child(2){animation-delay:.2s}.ibtn.on .eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+.track-name{max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+main{flex:1;padding-block:20px 40px}
+.screen{animation:screenIn .35s ease both}
+@keyframes screenIn{from{transform:translateY(10px)}to{transform:none}}
+
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.02em}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:23px;font-weight:900;font-size:15px;letter-spacing:.02em;background:var(--cap-amber);color:var(--outline);box-shadow:0 4px 0 #b9862a;transition:transform .12s,box-shadow .12s,filter .15s}
+@media (hover:hover){.btn:hover{filter:brightness(1.06)}}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b9862a}
+.btn.red{background:var(--cap-red);color:#fff;box-shadow:0 4px 0 #a8402f}
+.btn.ghost{background:var(--bench);color:var(--paper);box-shadow:0 4px 0 #0a1a20;border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+

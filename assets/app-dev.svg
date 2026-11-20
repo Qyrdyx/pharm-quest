@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#0c1f26" stroke="#284e56" stroke-width="6"/>
+  <g transform="translate(128 128) rotate(-40)">
+    <clipPath id="c"><rect x="-90" y="-38" width="180" height="76" rx="38"/></clipPath>
+    <g clip-path="url(#c)">
+      <rect x="-90" y="-38" width="90" height="76" fill="#ee6a52"/>
+      <rect x="0" y="-38" width="90" height="76" fill="#f7ecd6"/>
+      <rect x="-70" y="-26" width="140" height="11" rx="5.5" fill="#fff" opacity=".3"/>
+    </g>
+    <rect x="-90" y="-38" width="180" height="76" rx="38" fill="none" stroke="#1e282c" stroke-width="7"/>
+    <line x1="0" y1="-35" x2="0" y2="35" stroke="#1e282c" stroke-width="5"/>
+  </g>
+<rect x="96" y="168" width="152" height="72" rx="20" fill="#ff6b81" stroke="#0c1f26" stroke-width="8"/><text x="172" y="221" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="50" fill="#2a0f16">DEV</text></svg>

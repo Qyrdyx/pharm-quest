@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="药理闯关">
+<meta name="theme-color" content="#0c1f26">
+<meta name="format-detection" content="telephone=no">
+<title>药理闯关 186</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%20%3Crect%20x%3D%228%22%20y%3D%228%22%20width%3D%22240%22%20height%3D%22240%22%20rx%3D%2256%22%20fill%3D%22%230c1f26%22%20stroke%3D%22%23284e56%22%20stroke-width%3D%226%22%2F%3E%20%3Cg%20transform%3D%22translate(128%20128)%20rotate(-40)%22%3E%20%3CclipPath%20id%3D%22c%22%3E%3Crect%20x%3D%22-90%22%20y%3D%22-38%22%20width%3D%22180%22%20height%3D%2276%22%20rx%3D%2238%22%2F%3E%3C%2FclipPath%3E%20%3Cg%20clip-path%3D%22url(%23c)%22%3E%20%3Crect%20x%3D%22-90%22%20y%3D%22-38%22%20width%3D%2290%22%20height%3D%2276%22%20fill%3D%22%23ee6a52%22%2F%3E%20%3Crect%20x%3D%220%22%20y%3D%22-38%22%20width%3D%2290%22%20height%3D%2276%22%20fill%3D%22%23f7ecd6%22%2F%3E%20%3Crect%20x%3D%22-70%22%20y%3D%22-26%22%20width%3D%22140%22%20height%3D%2211%22%20rx%3D%225.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.3%22%2F%3E%20%3C%2Fg%3E%20%3Crect%20x%3D%22-90%22%20y%3D%22-38%22%20width%3D%22180%22%20height%3D%2276%22%20rx%3D%2238%22%20fill%3D%22none%22%20stroke%3D%22%231e282c%22%20stroke-width%3D%227%22%2F%3E%20%3Cline%20x1%3D%220%22%20y1%3D%22-35%22%20x2%3D%220%22%20y2%3D%2235%22%20stroke%3D%22%231e282c%22%20stroke-width%3D%225%22%2F%3E%20%3C%2Fg%3E%20%3C%2Fsvg%3E">
+<meta name="author" content="红烧肉大王TCA">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div id="app">
+  <header class="topbar">
+    <div class="wrap">
+      <button class="ibtn backbtn" id="backBtn" hidden aria-label="返回上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>返回</span></button>
+      <button class="logo" id="logo" aria-label="返回首页"><span class="pill-ico"></span>药理闯关<small>186 · 53 组</small><span class="tca-mark" title="作者 红烧肉大王TCA">红烧肉大王TCA</span></button>
+      <span class="spacer"></span>
+      <button class="ibtn" id="musicBtn" aria-label="播放或暂停音乐"><span class="eq"><i></i><i></i><i></i></span><span class="track-name" id="trackName">音乐</span></button>
+      <button class="ibtn" id="nextTrack" aria-label="下一首">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l9 7-9 7z"/><path d="M19 5v14"/></svg>
+      </button>
+      <button class="ibtn lang-btn" id="langBtn" data-zh aria-label="中文 / English"><b>中</b><i>/</i><b>EN</b></button>
+      <button class="ibtn" id="setBtn" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        <span>设置</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main"></main>
+</div>
+
+<div id="sheetHost"></div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>

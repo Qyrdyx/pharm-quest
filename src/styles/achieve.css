@@ -1,0 +1,231 @@
+/* 药理闯关 · 成就页、闪卡（银 / 金 / 彩虹镭射）、新闪卡亮相、彩蛋成就
+ * 由 src/pages/achieve.js 使用；以前和设置页的样式放在一起 */
+/* ---------- 成就与收集 ---------- */
+.ach-toast{position:fixed;top:72px;right:16px;z-index:120;display:flex;gap:12px;align-items:center;max-width:min(360px,calc(100vw - 32px));padding:12px 16px;border-radius:16px;cursor:pointer;
+  background:var(--ink);border:2px solid var(--c);box-shadow:0 12px 36px #0009,0 0 24px color-mix(in srgb,var(--c) 40%,transparent);animation:achIn .45s cubic-bezier(.2,1.4,.4,1)}
+.ach-toast.out{animation:achOut .35s ease-in forwards}
+.ach-toast .ach-ico{font-size:30px}
+.ach-toast small{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--c)}
+.ach-toast b{font-size:16px}
+@keyframes achIn{from{transform:translateX(120%) scale(.8);opacity:0}to{transform:none;opacity:1}}
+@keyframes achOut{to{transform:translateX(120%);opacity:0}}
+.ach-sum{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.ach-sum>div{flex:1 1 140px;padding:12px 16px;border-radius:16px;background:var(--bench);border:1px solid var(--line)}
+.ach-sum b{font-size:28px;font-family:var(--f-display)}
+.ach-sum span{margin-left:6px;color:var(--mute);font-size:13px}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+.ach{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--bench);border:1.5px solid var(--line);opacity:.7}
+.ach .ach-ico{font-size:30px;filter:grayscale(1) brightness(.7)}
+.ach.got{opacity:1;border-color:color-mix(in srgb,var(--c) 70%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,var(--bench)),var(--bench))}
+.ach.got .ach-ico{filter:none;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.ach-b{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.ach-b b{font-size:15px}
+.ach-b small{color:var(--mute);font-size:12px;line-height:1.45}
+.ach-t{font-size:11px;font-weight:800;color:var(--c);font-family:var(--f-mono,monospace)}
+.ach:not(.got) .ach-t{color:var(--mute)}
+.ach-p{height:5px;border-radius:3px;background:var(--ink);overflow:hidden;margin-top:2px}
+.ach-p i{display:block;height:100%;background:var(--c);border-radius:3px}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.col-card{position:relative;display:flex;flex-direction:column;gap:2px;min-height:96px;padding:10px 12px;border-radius:14px;background:var(--ink);border:1.5px dashed var(--line);color:var(--mute);overflow:hidden}
+.col-card b{font-size:13px;line-height:1.35;color:var(--mute)}
+.col-card.seen{border-style:solid;background:var(--bench)}
+.col-card.seen b{color:var(--paper)}
+.col-no{font-family:var(--f-mono,monospace);font-size:11px}
+.col-m{margin-top:auto;font-family:var(--f-display);font-size:20px;color:var(--paper)}
+.col-a{font-size:11px}
+.col-card.shiny{border:1.5px solid transparent;background:linear-gradient(var(--bench),var(--bench)) padding-box,linear-gradient(120deg,#f4bf4f,#ff6b81,#86cbff,#5fd6a8,#f4bf4f) border-box;background-size:auto,300% 300%;animation:shinyB 4s linear infinite}
+.col-card.shiny b{color:var(--paper)}
+.col-card.shiny .col-m{color:var(--cap-amber)}
+.col-card.shiny::after,.hcell.shiny::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,#ffffff40 45%,transparent 60%);background-size:250% 100%;animation:shinySweep 2.6s ease-in-out infinite}
+.col-card.shiny::before{content:"✦";position:absolute;top:6px;right:8px;color:var(--cap-amber);font-size:14px}
+@keyframes shinyB{to{background-position:0 0,300% 0}}
+@keyframes shinySweep{0%{background-position:150% 0}60%,100%{background-position:-100% 0}}
+.hcell.shiny{overflow:hidden;box-shadow:inset 0 0 0 2px #f4bf4f,0 0 12px #f4bf4f80}
+body.eco-holo .col-card.shiny,body.eco-holo .col-card.shiny::after,body.eco-holo .hcell.shiny::after{animation:none}
+/* ---------- 镭射闪卡（银 / 金 / 彩虹）---------- */
+.col-card.holo{--mx:50%;--my:50%;--rx:0deg;--ry:0deg;--tc:#c7d2dc;border:1.5px solid var(--tc);background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 18%,var(--bench)),var(--bench) 60%);
+  transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out,box-shadow .25s;box-shadow:0 0 0 1px #0004,0 6px 18px #0006,0 0 14px color-mix(in srgb,var(--tc) 45%,transparent);isolation:isolate}
+.col-card.holo.hov{transition:transform .06s linear,box-shadow .25s;box-shadow:0 0 0 1px #0004,0 14px 30px #0008,0 0 24px color-mix(in srgb,var(--tc) 70%,transparent);z-index:2}
+.col-card.holo>*:not(i){position:relative;z-index:2}
+.col-card.holo b{color:var(--paper)}
+.col-card.holo .col-m{color:var(--tc)}
+.col-card.t2{--tc:#f4bf4f}
+.col-card.t3{--tc:#ff9ff3}
+.holo-foil,.holo-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1}
+.holo-foil{mix-blend-mode:color-dodge;opacity:.42;background-size:300% 300%;background-position:var(--mx) var(--my);
+  background-image:repeating-linear-gradient(115deg,#9aa7b4 0%,#e9f1f8 6%,#7f8e9c 12%,#dfe8f0 18%,#9aa7b4 24%)}
+.col-card.t2 .holo-foil{opacity:.5;background-image:repeating-linear-gradient(115deg,#a8741a 0%,#ffe08a 6%,#c98f22 12%,#fff1b8 18%,#a8741a 24%)}
+.col-card.t3 .holo-foil{opacity:.62;background-image:repeating-linear-gradient(115deg,#ff6b81 0%,#ffd166 7%,#5fd6a8 14%,#86cbff 21%,#c56cf0 28%,#ff6b81 35%),radial-gradient(circle,#fff 0 1px,transparent 1.6px);background-size:300% 300%,14px 14px}
+.holo-glare{mix-blend-mode:overlay;opacity:0;background:radial-gradient(circle at var(--mx) var(--my),#fffc 0%,#fff6 18%,transparent 48%);transition:opacity .2s}
+.col-card.holo.hov .holo-glare{opacity:1}
+.col-card.holo:not(.hov) .holo-foil{animation:holoDrift 6s ease-in-out infinite alternate}
+@keyframes holoDrift{from{background-position:0% 20%}to{background-position:100% 80%}}
+.holo-tag{position:absolute!important;top:6px;right:8px;font-size:10px;font-weight:900;letter-spacing:.06em;padding:1px 6px;border-radius:6px;color:#1a1408;background:var(--tc)}
+.col-card.holo::before{content:none}
+body.eco-holo .col-card.holo .holo-foil{animation:none}
+.hcell.shiny.t2{box-shadow:inset 0 0 0 2px #f4bf4f,0 0 14px #f4bf4fa0}
+.hcell.shiny.t1{box-shadow:inset 0 0 0 2px #c7d2dc,0 0 10px #c7d2dc80}
+.hcell.shiny.t3{box-shadow:inset 0 0 0 2px #ff9ff3,0 0 16px #ff9ff3b0}
+/* 新闪卡亮相 */
+.cb-reveal{position:fixed;inset:0;z-index:130;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#050d10cc;backdrop-filter:blur(3px);cursor:pointer;animation:cbFade .3s ease}
+.cb-reveal.out{animation:achOut .3s ease-in forwards}
+.rv-card{width:200px;animation:rvFlip .9s cubic-bezier(.2,1.3,.4,1) both;perspective:800px}
+.rv-card .col-card{min-height:250px;padding:18px}
+.rv-card .col-card b{font-size:20px}
+.rv-card .col-m{font-size:40px}
+@keyframes rvFlip{0%{transform:rotateY(180deg) scale(.4);opacity:0}60%{transform:rotateY(-12deg) scale(1.08);opacity:1}100%{transform:none}}
+.rv-t{margin:6px 0 0;font-family:var(--f-display);font-size:30px;color:#ffd166;text-shadow:0 3px 0 #0a1a20}
+.rv-s{margin:0;color:var(--mute);font-size:12px}
+.col-card.holo b,.col-card.holo .col-m,.col-card.holo .col-a,.col-card.holo .col-no{text-shadow:0 1px 3px #000d,0 0 8px #0008}
+/* 彩蛋成就：隐藏的显示 ？？？ */
+.ach.hid{opacity:.8;border-style:dashed}
+.ach.hid .ach-ico{filter:none;opacity:.7}
+.ach.hid b{letter-spacing:.2em}
+.ach.fun.got{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,var(--bench)),color-mix(in srgb,#c56cf0 10%,var(--bench)))}
+
+/* ---------- 闪卡褪色：7 天没练光泽变淡（f1），14 天氧化发暗（f2，“待擦亮”）；档位标签保留 ---------- */
+.col-card.holo.f1 .holo-foil{opacity:.22;filter:saturate(.55)}
+.col-card.holo.f1{border-color:color-mix(in srgb,var(--tc) 55%,var(--line))}
+.col-card.holo.f2{border-color:color-mix(in srgb,var(--tc) 28%,#5a5148);background:linear-gradient(160deg,#2a2723,var(--bench) 70%)}
+.col-card.holo.f2 .holo-foil{opacity:.07;filter:grayscale(1)}
+.col-card.holo.f2 .holo-glare{display:none}
+.col-card.holo.f2::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(circle at 20% 30%,#8a6a3a33 0 18%,transparent 19%),radial-gradient(circle at 75% 70%,#6b5a4233 0 22%,transparent 23%),radial-gradient(circle at 60% 15%,#7a604033 0 10%,transparent 11%)}
+.col-card.holo.f2 .holo-tag{background:color-mix(in srgb,var(--tc) 45%,#6b6158);color:#1a1408}
+.col-card.holo.f2:not(.hov) .holo-foil{animation:none}
+.col-idle{font-size:11px;font-weight:800;color:#d9a46a}
+/* 离下一档的进度 */
+.col-nx{display:block;height:4px;border-radius:2px;background:var(--ink);overflow:hidden;margin-top:6px}
+.col-nx i{display:block;height:100%;background:linear-gradient(90deg,var(--cap-amber),#ffe08a);border-radius:2px}
+.col-card.holo .col-nx{background:#0006}
+.col-nt{font-size:11px;color:var(--mute);margin-top:2px}
+.col-card.holo .col-nt{color:#e8eef2;text-shadow:0 1px 3px #000d}
+/* 展示卡星标 */
+.col-star{position:absolute!important;bottom:6px;right:6px;width:24px;height:24px;border-radius:50%;border:1px solid #fff4;background:#0006;color:#fff8;font-size:13px;line-height:1;cursor:pointer;z-index:3!important}
+.col-star.on{background:var(--cap-amber);color:#1a1408;border-color:var(--cap-amber)}
+/* 重新擦亮：从灰暗扫成光亮 */
+.rv-card{position:relative}
+.rv-c{max-width:26em;margin:4px auto 0;text-align:center;color:#e8eef2;font-size:14px;line-height:1.5;text-shadow:0 1px 3px #000c}
+/* 钉住成就 */
+.ach{position:relative}
+.ach-pin{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--ink);font-size:13px;line-height:1;cursor:pointer;opacity:.45;filter:grayscale(1)}
+.ach-pin:hover{opacity:.9}
+.ach-pin.on{opacity:1;filter:none;border-color:var(--cap-amber);background:color-mix(in srgb,var(--cap-amber) 22%,var(--ink))}
+.ach-pin.bad{animation:shake .4s}
+.ach.got .ach-b,.ach .ach-b{padding-right:24px}
+.ach-msg{min-height:1.2em;color:var(--rose);font-weight:800;font-size:13px}
+/* 本周打卡 */
+.ach-wk small{display:block;margin-top:4px;color:var(--mute);font-size:11.5px}
+.wk-dots{display:flex;gap:4px;margin-top:6px}
+.wk-dots i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10.5px;font-weight:900;background:var(--ink);color:var(--faint,var(--mute));border:1px solid var(--line)}
+.wk-dots i.on{background:var(--mint);color:#08201a;border-color:var(--mint)}
+.wk-dots i.td{outline:2px solid var(--cap-amber);outline-offset:1px}
+.wk-dots i.fu{opacity:.45}
+/* 章节徽章 */
+.ch-badges{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+.ch-b{display:flex;flex-direction:column;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;text-decoration:none;color:var(--mute);
+  background:radial-gradient(var(--ink) 58%,transparent 59%),conic-gradient(var(--bc) var(--p),var(--line) 0);font-weight:900}
+.ch-b span{font-size:13px;color:var(--paper);max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-b small{font-size:10.5px}
+.ch-b.t1,.ch-b.t2,.ch-b.t3{background:radial-gradient(color-mix(in srgb,var(--bc) 22%,var(--ink)) 58%,transparent 59%),conic-gradient(var(--bc) 100%,var(--bc) 0);box-shadow:0 0 14px color-mix(in srgb,var(--bc) 45%,transparent)}
+.ch-b.t1 small,.ch-b.t2 small,.ch-b.t3 small{color:var(--bc)}
+.ch-tag{font-style:normal;font-size:12px;font-weight:900;padding:2px 8px;border-radius:8px;background:color-mix(in srgb,var(--bc) 22%,transparent);color:var(--bc);border:1px solid var(--bc)}
+/* 首页：展示卡 + 正在追的成就 + 待擦亮 */
+.ach-home{display:flex;gap:14px;align-items:stretch;margin-top:18px;flex-wrap:wrap}
+.ah-sc{flex:0 0 170px;cursor:pointer}
+.ah-sc .col-card{height:100%;min-height:120px}
+.ah-main{flex:1 1 320px;display:flex;gap:14px;flex-wrap:wrap}
+.ah-box{flex:1 1 260px;padding:12px 14px;border-radius:16px;background:var(--bench);border:1px solid var(--line);cursor:pointer}
+.ah-box h4{margin:0 0 8px;font-size:14px;color:var(--cap-amber)}
+.ah-pin{display:flex;gap:10px;align-items:center;padding:4px 0}
+.ah-pin>span{font-size:22px}
+.ah-pin>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ah-pin b{font-size:13px}
+.ah-pin small{font-size:11.5px;color:var(--mute)}
+.ah-tn{cursor:default;border-color:color-mix(in srgb,#d9a46a 55%,var(--line))}
+.ah-tn h4{color:#d9a46a}
+.ah-tn p{margin:0 0 8px;font-size:12.5px;color:var(--mute)}
+.ah-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ah-chips span{font-size:11.5px;padding:2px 8px;border-radius:8px;background:var(--ink);border:1px solid var(--line)}
+@media (max-width:560px){.ah-sc{flex:1 1 100%}.ah-sc .col-card{min-height:96px}}
+.col-card.holo .col-nt{padding-right:28px}
+
+/* ================= 卡面第二版：章节图标、正反面、三档材质、自然旧化 ================= */
+.col-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.col-card{min-height:158px;padding:10px 12px}
+.col-top{display:flex;align-items:center;gap:6px;min-height:16px}
+.col-ch{font-family:var(--f-mono,monospace);font-size:10px;font-weight:800;padding:0 5px;border-radius:5px;border:1px solid currentColor;opacity:.7}
+.col-ico{display:block;width:38px;height:38px;margin:6px 0 4px;color:var(--faint,var(--mute));opacity:.45}
+.col-ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.col-card.seen .col-ico{opacity:.7;color:var(--mute)}
+.col-card.holo .col-ico{color:var(--tc);opacity:1;filter:drop-shadow(0 0 5px color-mix(in srgb,var(--tc) 55%,transparent))}
+.col-card b{font-size:14.5px;line-height:1.3}
+.col-foot{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:6px}
+.col-foot .col-m{margin-top:0;font-size:22px}
+.col-card.holo .col-top,.col-card.holo .col-foot{position:relative;z-index:2}
+.rv-card .col-ico{width:64px;height:64px;margin:10px 0 8px}
+.rv-card .col-card b{font-size:22px}
+.rv-card .col-foot .col-m{font-size:40px}
+.ah-sc .col-ico{width:46px;height:46px}
+
+/* 正反面：点一下翻过来看这组的药和区分要点 */
+.col-flip{display:grid;perspective:1100px;cursor:pointer}
+.col-flip>.col-face{grid-area:1/1;display:flex;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .55s cubic-bezier(.3,.7,.25,1)}
+.col-flip>.col-face>*{flex:1;min-width:0}
+.col-flip>.col-face.back{transform:rotateY(180deg)}
+.col-flip.flipped>.col-face.front{transform:rotateY(-180deg)}
+.col-flip.flipped>.col-face.back{transform:rotateY(0)}
+.col-flip.flipped .col-card.holo{pointer-events:none}
+@media (prefers-reduced-motion:reduce){.col-flip>.col-face{transition:none}}
+.col-back{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:14px;background:linear-gradient(170deg,var(--bench),var(--ink));border:1.5px solid var(--line);font-size:11.5px;line-height:1.35;color:var(--mute);overflow:hidden}
+.col-back b{color:var(--paper);font-size:13px}
+.col-back .col-be{font-size:10.5px;color:var(--faint,var(--mute))}
+.col-back ul{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.col-back li{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.col-back li em{font-style:normal;font-weight:800;color:var(--paper);margin-right:5px}
+.col-back .col-more{font-size:10.5px;color:var(--mute)}
+.col-back .col-hint{margin-top:auto;padding-top:4px;font-size:10px;color:var(--faint,var(--mute));opacity:.8}
+
+/* 三档材质：银 = 拉丝金属边；金 = 加厚浮雕金边 + 四角小钻；彩虹 = 棱镜边 + 星光 */
+.col-card.holo.t1{border:2px solid transparent;background:linear-gradient(160deg,color-mix(in srgb,#c7d2dc 16%,var(--bench)),var(--bench) 60%) padding-box,repeating-linear-gradient(115deg,#7f8b97 0 2px,#eef5fa 2px 3px,#a9b5c1 3px 5px,#d7e0e8 5px 6px) border-box}
+.col-card.holo.t2{border:3px solid transparent;box-shadow:inset 0 0 0 1px #ffe08a66,0 0 14px #f4bf4f22;
+  background:radial-gradient(circle at 9px 9px,#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at calc(100% - 9px) 9px,#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at 9px calc(100% - 9px),#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,
+  linear-gradient(160deg,color-mix(in srgb,#f4bf4f 18%,var(--bench)),var(--bench) 62%) padding-box,linear-gradient(135deg,#7a4e0e,#ffe08a 22%,#b8801f 42%,#fff1b8 58%,#a8741a 78%,#ffd166) border-box}
+.col-card.holo.t3{border:3px solid transparent;box-shadow:0 0 18px #ff9ff333;
+  background:linear-gradient(160deg,color-mix(in srgb,#ff9ff3 14%,var(--bench)),var(--bench) 62%) padding-box,conic-gradient(from 210deg,#ff6b81,#ffd166,#5fd6a8,#86cbff,#c56cf0,#ff6b81) border-box}
+.col-card.holo.t3 .holo-foil::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 18% 22%,#fff 0 1.2px,transparent 2px),radial-gradient(circle at 72% 30%,#fff 0 1px,transparent 1.8px),radial-gradient(circle at 40% 78%,#fff 0 1.4px,transparent 2.2px),radial-gradient(circle at 86% 70%,#fff 0 1px,transparent 1.8px);animation:sparkTw 2.6s ease-in-out infinite alternate}
+@keyframes sparkTw{0%{opacity:.25}100%{opacity:1}}
+body.eco-holo .col-card.holo.t3 .holo-foil::after{animation:none;opacity:.7}
+
+/* 自然旧化：7 天没练光泽变淡；14 天边框失去金属光泽、卡面发灰泛黄、镭射消失（不再是一块块斑点） */
+.col-card.holo.f2::after{content:none}
+.col-card.holo.f1 .holo-foil{opacity:.18;filter:saturate(.5)}
+.col-card.holo.f1 .col-ico{filter:none;opacity:.75}
+.col-card.holo.f2{box-shadow:none;background:linear-gradient(165deg,#3a352c,#262420 70%) padding-box,linear-gradient(135deg,#4d463c,#8c8170 40%,#5a5247 70%,#7a7062) border-box}
+.col-card.holo.f2 .holo-foil,.col-card.holo.f2 .holo-glare{display:none}
+.col-card.holo.f2 .col-ico{color:#a69a84;filter:none;opacity:.7}
+.col-card.holo.f2 .col-m{color:#c9b48c}
+.col-card.holo.f2 b{color:#d8d0c2}
+/* 背面不撑高卡片：叠在正面上，按正面大小显示（药最多 4 个，每个一行） */
+.col-flip{position:relative;display:block}
+.col-flip>.col-face.front{position:relative}
+.col-flip>.col-face.back{position:absolute;inset:0}
+.col-back li{-webkit-line-clamp:1}
+.col-back{gap:2px}
+.col-card.holo.t1{background:linear-gradient(160deg,color-mix(in srgb,#c7d2dc 16%,var(--bench)),var(--bench) 60%) padding-box,linear-gradient(135deg,#7f8b97,#f2f7fb 28%,#9aa6b2 48%,#e6eef5 68%,#8a96a2 88%,#d7e0e8) border-box}
+.col-flip{display:flex}
+.col-flip>.col-face.front{flex:1}
+/* 旧化要盖过三档边框（选择器加权） */
+.col-card.holo.f2.f2{box-shadow:none;background:linear-gradient(165deg,#3a352c,#262420 70%) padding-box,linear-gradient(135deg,#4d463c,#8c8170 40%,#5a5247 70%,#7a7062) border-box}
+
+/* 重新擦亮（第二版）：不再翻转 + 滤镜 + 混合模式叠在一起（会有拖影），只用位移 / 缩放 / 透明度这类不用重画的动画：
+   卡片弹出 → 一层灰暗的“氧化层”淡掉 → 一道高光扫过 */
+.cb-reveal.polish .rv-card{animation:rvPop .45s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes rvPop{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+.rv-card .rv-patina{position:absolute;inset:0;z-index:5;border-radius:14px;pointer-events:none;background:linear-gradient(165deg,#3a352cee,#262420f2 70%);will-change:opacity;animation:rvPatina .75s .5s ease-out forwards}
+@keyframes rvPatina{to{opacity:0}}
+.rv-card .rv-shine{position:absolute;inset:0;z-index:6;overflow:hidden;border-radius:14px;pointer-events:none}
+.rv-card .rv-shine::before{content:"";position:absolute;top:-25%;bottom:-25%;left:-60%;width:45%;background:linear-gradient(105deg,transparent,#ffffffb8 50%,transparent);transform:translateX(0) rotate(8deg);will-change:transform;animation:rvSweep .85s .6s ease-out forwards}
+@keyframes rvSweep{to{transform:translateX(420%) rotate(8deg)}}
+@media (prefers-reduced-motion:reduce){.rv-card .rv-patina{animation-duration:.01s}.rv-card .rv-shine{display:none}}

@@ -1,0 +1,39 @@
+/* ——— mascot ——— */
+.mascot{position:relative;display:inline-block;flex:none}
+.mascot svg{display:block;width:100%;height:auto;overflow:visible}
+.mascot .m-body{transform-origin:60px 140px;transform-box:view-box;animation:bob 2.4s ease-in-out infinite}
+.mascot .m-shadow{fill:#000;opacity:.3}
+.mascot .stroke{fill:none;stroke:var(--outline);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mascot .fillk{fill:var(--outline)}
+.mascot .eyes,.mascot .mouth{display:none}
+.mascot .m-arm{transform-box:view-box;transition:transform .3s}
+.mascot .m-arm-l{transform-origin:32px 92px}.mascot .m-arm-r{transform-origin:88px 92px}
+.mascot[data-mood="idle"] .eyes-n,.mascot[data-mood="idle"] .m-n,
+.mascot[data-mood="think"] .eyes-n,.mascot[data-mood="think"] .m-t,
+.mascot[data-mood="happy"] .eyes-h,.mascot[data-mood="happy"] .m-h,
+.mascot[data-mood="cheer"] .eyes-h,.mascot[data-mood="cheer"] .m-h,
+.mascot[data-mood="sad"] .eyes-s,.mascot[data-mood="sad"] .m-s,
+.mascot[data-mood="shock"] .eyes-o,.mascot[data-mood="shock"] .m-o{display:inline}
+.mascot .eyes-n{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}20%{transform:translateY(2px) scale(1.06,.94)}50%{transform:translateY(-16px) scale(.96,1.05)}80%{transform:translateY(0) scale(1.04,.96)}}
+@keyframes droop{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(5px) rotate(-6deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-3deg)}40%{transform:translateX(6px) rotate(3deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes tilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes spinhop{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-20px) rotate(180deg)}100%{transform:translateY(0) rotate(360deg)}}
+.mascot[data-mood="happy"] .m-body{animation:hop .55s ease 2}
+.mascot[data-mood="cheer"] .m-body{animation:spinhop .8s cubic-bezier(.3,.7,.4,1) 1,bob 2.4s .8s ease-in-out infinite}
+.mascot[data-mood="cheer"] .m-arm-l{transform:rotate(70deg)}
+.mascot[data-mood="cheer"] .m-arm-r{transform:rotate(-70deg)}
+.mascot[data-mood="happy"] .m-arm-l{transform:rotate(40deg)}
+.mascot[data-mood="happy"] .m-arm-r{transform:rotate(-40deg)}
+.mascot[data-mood="sad"] .m-body{animation:droop .5s ease forwards}
+.mascot[data-mood="sad"] .m-arm-l{transform:rotate(-15deg)}
+.mascot[data-mood="sad"] .m-arm-r{transform:rotate(15deg)}
+.mascot[data-mood="shock"] .m-body{animation:shake .45s ease 2}
+.mascot[data-mood="think"] .m-body{animation:tilt 1.8s ease-in-out infinite}
+.mascot[data-mood="think"] .m-arm-r{transform:rotate(-110deg)}
+.bubble{position:absolute;left:78%;top:-6px;min-width:110px;max-width:190px;padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--cap-cream);color:var(--outline);font-size:13px;font-weight:800;line-height:1.35;box-shadow:0 3px 0 rgba(0,0,0,.35);transform-origin:0 100%;animation:pop .3s cubic-bezier(.3,1.6,.5,1) both;z-index:3}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+

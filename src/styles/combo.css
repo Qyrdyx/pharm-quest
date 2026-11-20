@@ -1,0 +1,108 @@
+/* 药理闯关 · 连击与连线特效（大字、光环、震屏、狂热光晕、连击条、连线走线画布、方块锁定 / 涟漪、一轮结算）
+ * 由 src/ui/combo.js 和 src/ui/linkfx.js 使用；以前和设置页的样式放在一起 */
+/* ---------- 连击分级 ---------- */
+.cb-word{position:fixed;left:50%;top:38%;z-index:80;pointer-events:none;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);animation:cbWord 1.25s cubic-bezier(.2,1.4,.4,1) forwards}
+.cb-word b{font-family:var(--f-display);font-size:calc(54px * var(--s));line-height:1.05;color:#fff;-webkit-text-stroke:2px var(--outline,#0a1a20);paint-order:stroke fill;
+  background:linear-gradient(180deg,#fff 0%,var(--c) 55%,color-mix(in srgb,var(--c) 60%,#000) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 0 var(--outline,#0a1a20)) drop-shadow(0 0 18px color-mix(in srgb,var(--c) 70%,transparent));white-space:nowrap}
+.cb-word small{margin-top:4px;font-family:var(--f-mono,monospace);font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--c);text-shadow:0 2px 0 var(--outline,#0a1a20)}
+.cb-word.hot b{animation:cbShake .35s .15s 2}
+.cb-word.calm{animation:cbFade 1.1s ease forwards}
+@keyframes cbWord{0%{transform:translate(-50%,-50%) scale(.2) rotate(-8deg);opacity:0}18%{transform:translate(-50%,-50%) scale(1.18) rotate(3deg);opacity:1}30%{transform:translate(-50%,-50%) scale(.96) rotate(-1deg)}42%{transform:translate(-50%,-50%) scale(1.03) rotate(0)}78%{transform:translate(-50%,-56%) scale(1);opacity:1}100%{transform:translate(-50%,-80%) scale(.9);opacity:0}}
+@keyframes cbShake{0%,100%{transform:none}25%{transform:translateX(-5px) rotate(-2deg)}75%{transform:translateX(5px) rotate(2deg)}}
+@keyframes cbFade{0%{opacity:0}15%,75%{opacity:1}100%{opacity:0}}
+.cb-ring{position:fixed;left:50%;top:38%;z-index:79;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:6px solid var(--c);pointer-events:none;animation:cbRing .75s ease-out forwards}
+@keyframes cbRing{from{transform:scale(.3);opacity:.9}to{transform:scale(9);opacity:0;border-width:1px}}
+.cb-glow{position:fixed;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 60px 6px color-mix(in srgb,var(--c) 55%,transparent);animation:cbGlow 1.6s ease-in-out infinite alternate}
+@keyframes cbGlow{from{opacity:.45}to{opacity:1}}
+.stat .v.combo{transition:color .3s}
+.stat .v.combo.cb-hot{text-shadow:0 0 12px currentColor}
+.cb-meter{height:5px;margin-top:4px;border-radius:3px;background:var(--bench-2);overflow:hidden}
+.cb-meter i{display:block;height:100%;width:0;border-radius:3px;background:var(--c,#5fd6a8);transition:width .35s cubic-bezier(.3,1.4,.5,1)}
+.cb-meter.fever i{background:linear-gradient(90deg,var(--c),#fff,var(--c));background-size:200% 100%;animation:cbFever 1s linear infinite}
+@keyframes cbFever{to{background-position:-200% 0}}
+.cb-break{position:fixed;left:50%;top:40%;z-index:80;pointer-events:none;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;animation:cbBreak 1.15s ease-in forwards}
+.cb-break b{font-family:var(--f-display);font-size:34px;color:var(--rose);text-shadow:0 3px 0 var(--outline,#0a1a20)}
+.cb-break small{font-family:var(--f-mono,monospace);font-weight:800;color:var(--mute);text-decoration:line-through}
+.cb-break.sm b{font-size:24px}
+.cb-break.calm{animation:cbFade 1s ease forwards}
+@keyframes cbBreak{0%{opacity:0;transform:translate(-50%,-50%) scale(1.3)}15%{opacity:1;transform:translate(-50%,-50%) scale(1)}25%{transform:translate(-48%,-50%) rotate(2deg)}35%{transform:translate(-52%,-50%) rotate(-2deg)}60%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,10%) rotate(6deg)}}
+
+.cb-chip{position:fixed;z-index:81;pointer-events:none;transform:translate(-50%,-100%);font-family:var(--f-display);font-size:24px;color:var(--c);text-shadow:0 2px 0 var(--outline,#0a1a20);animation:comboUp .9s ease forwards}
+.cb-chip.sm{font-size:16px}
+.cb-round{position:fixed;left:50%;top:42%;z-index:80;pointer-events:none;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 28px;border-radius:22px;
+  background:color-mix(in srgb,var(--ink) 88%,transparent);border:2px solid var(--cap-amber);box-shadow:0 12px 40px #0008;animation:cbWord 1.1s cubic-bezier(.2,1.4,.4,1) forwards}
+.cb-round b{font-family:var(--f-display);font-size:26px;color:var(--paper)}
+.cb-round small{color:var(--mute);font-family:var(--f-mono,monospace)}
+.cb-round.calm{animation:cbFade 1s ease forwards}
+.cb-stars{display:flex;gap:8px;font-size:38px;line-height:1}
+.cb-stars span{color:var(--bench-2)}
+.cb-stars span.on{color:var(--cap-amber);animation:pop .4s cubic-bezier(.3,1.6,.5,1) both;text-shadow:0 0 12px color-mix(in srgb,var(--cap-amber) 70%,transparent)}
+/* ---------- 震屏、飘向计数的光点、方块挤压、粒子以外的小特效 ---------- */
+#main.cb-shake{animation:cbShakeM .3s cubic-bezier(.36,.07,.19,.97)}
+@keyframes cbShakeM{10%,90%{transform:translate(calc(var(--amp) * -.3),0)}20%,80%{transform:translate(calc(var(--amp) * .5),calc(var(--amp) * -.2))}30%,50%,70%{transform:translate(calc(var(--amp) * -1),calc(var(--amp) * .3))}40%,60%{transform:translate(var(--amp),0)}}
+.cb-squash{animation:cbSquash .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cbSquash{0%{transform:scale(1)}18%{transform:scale(1.08,.88)}45%{transform:scale(.96,1.06)}70%{transform:scale(1.02,.99)}100%{transform:none}}
+.cb-fly{position:fixed;z-index:82;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 30%,var(--c) 60%,transparent 72%);box-shadow:0 0 10px var(--c);transition:transform .55s cubic-bezier(.5,-.3,.6,1),opacity .55s ease-in}
+.cb-drop{animation:cbDrop .45s cubic-bezier(.3,1.7,.5,1)}
+@keyframes cbDrop{0%{transform:translateY(-10px) scale(1.5)}55%{transform:translateY(2px) scale(.94)}100%{transform:none}}
+.cb-ring.r2{animation-delay:.12s;opacity:0;animation-fill-mode:forwards}
+.cb-ring.sm{position:fixed;width:30px;height:30px;margin:-15px 0 0 -15px}
+.cb-svg{position:fixed;inset:0;width:100vw;height:100vh;z-index:61;pointer-events:none;overflow:visible}
+
+.tile.cb-crumble{animation:cbCrumble .4s ease-in forwards}
+@keyframes cbCrumble{to{transform:scale(.6) rotate(6deg);opacity:0;filter:blur(2px)}}
+.cb-sweep{position:fixed;z-index:62;pointer-events:none;border-radius:16px;background:linear-gradient(105deg,transparent 30%,#ffd16688 48%,#fff8 50%,#ffd16688 52%,transparent 70%);background-size:250% 100%;animation:cbSweep .85s ease-out forwards}
+@keyframes cbSweep{from{background-position:150% 0}to{background-position:-60% 0}}
+/* ---------- 大字：低 / 中 / 高 三种做法 ----------
+ * 低：纯色字 + 投影描边，整词淡入；
+ * 中：渐变字；描边、厚度、光晕画在字后面的一层（b::before，只画一次）；先微缩再弹出过冲；
+ * 高：逐字落下。每个字 = 外层 span（负责动）+ 渐变字 i + 后面的厚度层 ::before + 前面的扫光层 ::after。
+ * 描边和厚度不用 drop-shadow 滤镜（字在动的每一帧都要重算，会掉帧）；扫光只重画最上面那层纯文字。
+ * 整块大字单独一层合成，缩放 / 淡出只动这一层。 */
+.cb-word,.cb-ring{will-change:transform,opacity;contain:layout style}
+.cb-word b{will-change:transform}
+.cb-word.top{top:24%}
+.cb-ring.top{top:24%}
+.cb-word.m-low{animation:cbLow var(--life) ease forwards}
+.cb-word.m-low b{background:none;color:var(--c);-webkit-text-stroke:0;filter:none;text-shadow:0 2px 0 #0a1a20,2px 0 0 #0a1a20,-2px 0 0 #0a1a20,0 -2px 0 #0a1a20,0 4px 8px #0008}
+@keyframes cbLow{0%{opacity:0;transform:translate(-50%,-50%) scale(.92)}18%{opacity:1;transform:translate(-50%,-50%) scale(1)}72%{opacity:1;transform:translate(-50%,-52%)}100%{opacity:0;transform:translate(-50%,-60%)}}
+.cb-word.m-mid{animation:cbMid var(--life) cubic-bezier(.2,1,.3,1) forwards}
+@keyframes cbMid{0%{opacity:0;transform:translate(-50%,-50%) scale(.62)}9%{opacity:1;transform:translate(-50%,-50%) scale(.8)}26%{transform:translate(-50%,-50%) scale(1.14)}40%{transform:translate(-50%,-50%) scale(.97)}52%{transform:translate(-50%,-50%) scale(1.02)}62%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-53%) scale(1)}100%{opacity:0;transform:translate(-50%,-66%) scale(.96)}}
+.cb-word.m-mid small,.cb-word.m-high small{animation:cbSub var(--life) ease forwards}
+@keyframes cbSub{0%,18%{opacity:0;transform:translateY(10px)}38%,80%{opacity:1;transform:none}100%{opacity:0}}
+.cb-word.m-mid b{position:relative;z-index:0;background:none;filter:none;-webkit-text-stroke:0;color:inherit}
+.cb-word.m-mid b>i{font-style:normal;color:transparent;background:linear-gradient(180deg,#fff 0%,color-mix(in srgb,var(--c) 55%,#fff) 38%,var(--c) 72%,var(--c) 100%);-webkit-background-clip:text;background-clip:text}
+.cb-word.m-mid b::before{content:attr(data-t);position:absolute;inset:0;z-index:-1;color:#0a1a20;pointer-events:none;
+  text-shadow:1.5px 0 0 #0a1a20,-1.5px 0 0 #0a1a20,0 -1.5px 0 #0a1a20,0 1.5px 0 #0a1a20,1.2px 1.2px 0 #0a1a20,-1.2px 1.2px 0 #0a1a20,1.2px -1.2px 0 #0a1a20,-1.2px -1.2px 0 #0a1a20,0 2px 0 #0a1a20,0 4px 0 #0a1a20,0 0 14px color-mix(in srgb,var(--c) 60%,transparent)}
+.cb-word.m-high{animation:cbHighWrap var(--life) linear forwards}
+@keyframes cbHighWrap{0%,84%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-58%)}}
+.cb-word.m-high b{display:flex;background:none;-webkit-text-stroke:0;filter:none;color:inherit}
+.cb-word.m-high.hot b{animation:none}
+.cb-word.m-high b span{position:relative;display:inline-block;--sh:color-mix(in srgb,var(--c) 42%,#000);will-change:transform,opacity;
+  animation:cbChar .52s cubic-bezier(.3,1.5,.5,1) calc(var(--i) * 45ms) both}
+.cb-word.m-high.burst b span{animation:cbChar .52s cubic-bezier(.3,1.5,.5,1) calc(var(--i) * 45ms) both,cbScatter .36s ease-in calc(var(--life) - 400ms) forwards}
+.cb-word.m-high b span>i{font-style:normal;display:inline-block;position:relative;color:transparent;will-change:transform;
+  background-image:linear-gradient(180deg,#fff 0%,#fff 25%,color-mix(in srgb,var(--c) 70%,#fff) 50%,var(--c) 78%,color-mix(in srgb,var(--c) 75%,#000) 100%);-webkit-background-clip:text;background-clip:text}
+.cb-word.m-high b span::before{content:attr(data-ch);position:absolute;left:0;top:0;z-index:-1;color:#0a1a20;pointer-events:none;
+  text-shadow:1.5px 0 0 #0a1a20,-1.5px 0 0 #0a1a20,0 -1.5px 0 #0a1a20,0 1.5px 0 #0a1a20,1.2px 1.2px 0 #0a1a20,-1.2px 1.2px 0 #0a1a20,1.2px -1.2px 0 #0a1a20,-1.2px -1.2px 0 #0a1a20,0 2px 0 var(--sh),0 4px 0 var(--sh),0 6px 0 var(--sh),0 9px 0 #0a1a20,0 0 16px color-mix(in srgb,var(--c) 65%,transparent)}
+.cb-word.m-high.hot b span::before{text-shadow:1.5px 0 0 #0a1a20,-1.5px 0 0 #0a1a20,0 -1.5px 0 #0a1a20,0 1.5px 0 #0a1a20,1.2px 1.2px 0 #0a1a20,-1.2px 1.2px 0 #0a1a20,1.2px -1.2px 0 #0a1a20,-1.2px -1.2px 0 #0a1a20,0 2px 0 var(--sh),0 4px 0 var(--sh),0 6px 0 var(--sh),0 8px 0 var(--sh),0 10px 0 var(--sh),0 13px 0 #0a1a20,0 0 22px var(--c)}
+.cb-word.m-high b span::after{content:attr(data-ch);position:absolute;left:0;top:0;z-index:1;color:transparent;pointer-events:none;
+  background:linear-gradient(110deg,transparent 38%,#ffffffd9 50%,transparent 62%) 160% 0/260% 100% no-repeat;-webkit-background-clip:text;background-clip:text;
+  animation:cbShine2 .6s ease calc(var(--n) * 45ms + 380ms) forwards}
+@keyframes cbChar{0%{opacity:0;transform:translateY(-64px) rotate(-14deg) scale(1.3)}55%{opacity:1;transform:translateY(6px) rotate(3deg) scale(.94)}76%{transform:translateY(-3px) rotate(-1deg) scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes cbScatter{to{opacity:0;transform:translate(var(--dx),46px) rotate(var(--dr)) scale(.6)}}
+@keyframes cbShine2{to{background-position:-60% 0}}
+.cb-word.en b{font-family:"Nunito",var(--f-display);font-weight:900;letter-spacing:.01em;font-size:calc(50px * var(--s))}
+.cb-chip.en{font-family:"Nunito",var(--f-display);font-weight:900}
+.cb-chip{animation-duration:.75s}
+
+/* ---------- 连线：电路板走线 + 流苏流光（画布在网格里，盖在方块上，不挡点击）；方块锁定 / 涟漪 ---------- */
+.match-grid{position:relative}
+.match-grid .tile{position:relative;z-index:1}
+.match-grid .match-col h3{position:relative;z-index:1}
+.cb-comet{position:absolute;left:-40px;top:-40px;pointer-events:none;z-index:2}
+.tile.cb-lock{animation:cbLock .5s ease-out}
+@keyframes cbLock{0%,30%{border-color:#d9f7ff;background-color:color-mix(in srgb,#3fc6e8 22%,var(--bench))}100%{}}
+.tile.cb-ripple::before{content:"";position:absolute;inset:-2px;border-radius:inherit;border:2px solid var(--rc);pointer-events:none;animation:cbRip .6s ease-out forwards;will-change:transform,opacity}
+@keyframes cbRip{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.12,1.35)}}
