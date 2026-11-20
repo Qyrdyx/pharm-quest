@@ -20,20 +20,21 @@ const SVG0 = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 </svg>`;
 const SVG = DEVI ? SVG0.replace("</svg>", `<rect x="96" y="168" width="152" height="72" rx="20" fill="#ff6b81" stroke="#0c1f26" stroke-width="8"/><text x="172" y="221" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="50" fill="#2a0f16">DEV</text></svg>`) : SVG0;
 fs.writeFileSync(path.join(DIR, NAME + ".svg"), SVG);
-const SIZES = [256, 64, 48, 32, 16];
+const SIZES = [256, 64, 48, 32, 16], PWA = DEVI ? [] : [192, 512];   // 192 / 512：网页版“添加到主屏幕”用的图标
 const c = await launch(9401, 400, 300); await c.send("Runtime.enable");
 const r = await c.send("Runtime.evaluate", { awaitPromise: true, returnByValue: true, expression: `(async () => {
   const img = new Image(); img.src = "data:image/svg+xml;base64," + btoa(${JSON.stringify(SVG)}); await img.decode();
   const out = [];
-  for (const s of ${JSON.stringify(SIZES)}) { const cv = document.createElement("canvas"); cv.width = cv.height = s; const x = cv.getContext("2d"); x.imageSmoothingQuality = "high"; x.drawImage(img, 0, 0, s, s); out.push(cv.toDataURL("image/png").split(",")[1]); }
+  for (const s of ${JSON.stringify([...SIZES, ...PWA])}) { const cv = document.createElement("canvas"); cv.width = cv.height = s; const x = cv.getContext("2d"); x.imageSmoothingQuality = "high"; x.drawImage(img, 0, 0, s, s); out.push(cv.toDataURL("image/png").split(",")[1]); }
   return out; })()` });
 c.close();
-const pngs = r.result.value.map(b => Buffer.from(b, "base64"));
+const all = r.result.value.map(b => Buffer.from(b, "base64")), pngs = all.slice(0, SIZES.length);
+PWA.forEach((s, i) => fs.writeFileSync(path.join(DIR, `${NAME}-${s}.png`), all[SIZES.length + i]));
 fs.writeFileSync(path.join(DIR, NAME + ".png"), pngs[0]);
 // ICO 文件：6 字节头 + 每个尺寸 16 字节目录项 + PNG 数据
 const head = Buffer.alloc(6 + 16 * SIZES.length); head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(SIZES.length, 4);
 let off = head.length;
 SIZES.forEach((s, i) => { const e = 6 + 16 * i; head.writeUInt8(s >= 256 ? 0 : s, e); head.writeUInt8(s >= 256 ? 0 : s, e + 1); head.writeUInt16LE(1, e + 4); head.writeUInt16LE(32, e + 6); head.writeUInt32LE(pngs[i].length, e + 8); head.writeUInt32LE(off, e + 12); off += pngs[i].length; });
 fs.writeFileSync(path.join(DIR, NAME + ".ico"), Buffer.concat([head, ...pngs]));
-console.log(`图标已生成：assets/${NAME}.svg、${NAME}.png、${NAME}.ico`);
+console.log(`图标已生成：assets/${NAME}.svg、${NAME}.png、${NAME}.ico${PWA.length ? "、" + PWA.map(s => `${NAME}-${s}.png`).join("、") : ""}`);
 setTimeout(() => process.exit(0), 300);
