@@ -16,8 +16,8 @@ reg({ achHomeStrip: () => achHomeStrip, bindAchStrip: () => bindAchStrip, fadeOf
 Object.assign(PG, { achPage });   // 页面跳转函数：core/nav.js 会包一层，记录返回路径
 
 /* ---------- 收集 ---------- */
-/* 闪卡分三档：银闪（练过 10 题、掌握度 80%）→ 金闪（30 题、90%）→ 彩虹闪（50 题、95%） */
-export const SHINY = [[10, 0.8, "银闪", "Silver"], [30, 0.9, "金闪", "Gold"], [50, 0.95, "彩虹闪", "Rainbow"]];
+/* 闪卡分三档：银闪（练过 10 题、掌握度 80%）→ 金闪（30 题、90%）→ 幻彩闪（50 题、95%） */
+export const SHINY = [[10, 0.8, "银闪", "Silver"], [30, 0.9, "金闪", "Gold"], [50, 0.95, "幻彩闪", "Iridescent"]];
 export const shinyTier = g => { const a = mastery[g.id]?.a || 0, m = masteryOf(g.id) ?? 0; let t = 0; SHINY.forEach((s, i) => { if (a >= s[0] && m >= s[1]) t = i + 1; }); return t; };
 export const isShiny = g => shinyTier(g) > 0;
 /* ---------- 闪卡褪色 ----------
@@ -38,10 +38,13 @@ export function nextTier(g) {
   const byM = Math.max(0, Math.ceil((M * (a + 2) - (c + 1)) / (1 - M) - 1e-9));
   return { t: t + 1, k: Math.max(A - a, byM, 1), p: Math.max(0, Math.min(1, a / A, m / M)) };
 }
-/* 镭射卡：底卡 + 彩虹镭射层（随指针换色）+ 跟着指针的高光 + 星点纹理；--mx/--my 由 bindHolo 设置 */
+/* 镭射卡：底卡 + 镭射层（随指针换色）+ 跟着指针的高光；--mx/--my 由 bindHolo 设置。
+   幻彩卡另加章节类名（换暗光颜色）和 --emb：用这一章的图标画成细线大图腾，彩虹只沿着它显现 */
+const EMB = {};
+const embOf = ch => EMB[ch] || (EMB[ch] = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='#000' stroke-width='.5' stroke-linecap='round' stroke-linejoin='round'>${ICON[ch] || ICON.pack}</g></svg>`).replace(/'/g, "%27")}")`);
 export function holoCard(g, inner, extra = "") {
-  const t = shinyTier(g), f = t ? fadeOf(g) : 0;
-  return `<div class="col-card${t ? " holo t" + t + (f ? " f" + f : "") : (mastery[g.id]?.a ? " seen" : "")}" ${extra}>${t ? '<i class="holo-foil"></i><i class="holo-glare"></i>' : ""}${inner}${t ? `<span class="holo-tag">${TT(SHINY[t - 1][2], SHINY[t - 1][3])}${f === 2 ? TT(" · 待擦亮", " · dull") : ""}</span>` : ""}</div>`;
+  const t = shinyTier(g), f = t ? fadeOf(g) : 0, ch3 = t === 3 ? ` ch-${ICON[g.ch] ? g.ch : "pack"}` : "", sty = t === 3 ? ` style='--emb:${embOf(g.ch)}'` : "";
+  return `<div class="col-card${t ? " holo t" + t + (f ? " f" + f : "") : (mastery[g.id]?.a ? " seen" : "")}${ch3}"${sty} ${extra}>${t ? '<i class="holo-foil"></i><i class="holo-glare"></i>' : ""}${inner}${t ? `<span class="holo-tag">${TT(SHINY[t - 1][2], SHINY[t - 1][3])}${f === 2 ? TT(" · 待擦亮", " · dull") : ""}</span>` : ""}</div>`;
 }
 /* ---------- 卡面 ----------
  * 正面：左上编号 + 章号，中间是这一章的线条图标，组名放大，底部一行掌握度和题数；
@@ -333,10 +336,10 @@ export function achPage(tab = "ach") {
       ${nx ? `<span class="col-nx"><i style="width:${Math.round(nx.p * 100)}%"></i></span><span class="col-nt">${TT(`再连对 ${nx.k} 题 → ${SHINY[nx.t - 1][2]}`, `${nx.k} more right → ${SHINY[nx.t - 1][3]}`)}</span>` : ""}
       ${t ? `<button class="col-star${star ? " on" : ""}" data-star="${g.id}" title="${TT("设为首页展示卡", "Show on the home page")}">★</button>` : ""}`;
     return flipCard(g, holoCard(g, cardFront(g, { extra })), `title="${esc(TT("点一下翻面看要点", "Tap to see the key points"))}"`); };
-  const BADGE = [null, [TT("银章", "Silver"), "#c7d2dc"], [TT("金章", "Gold"), "#f4bf4f"], [TT("彩虹章", "Rainbow"), "#ff9ff3"]];
+  const BADGE = [null, [TT("银章", "Silver"), "#c7d2dc"], [TT("金章", "Gold"), "#f4bf4f"], [TT("幻彩章", "Iridescent"), "#c9b8ff"]];
   const chapters = P.chapters.map(ch => ({ ch, gs: G.filter(g => g.ch === ch[0]) })).filter(x => x.gs.length);
   show(`<div class="sel-head"><div><div class="eyebrow">${TT("成就与收集", "Achievements & collection")}</div><h2 style="font-size:28px">${tab === "ach" ? TT("成就", "Achievements") : TT("闪卡收集", "Shiny card collection")}</h2>
-      <p style="color:var(--mute);margin:6px 0 0;max-width:66ch">${tab === "ach" ? TT("练得越多解锁越多：连击、满分、打卡、全图鉴……点 📌 可以把想追的成就钉到首页（最多 3 个）。", "Unlock more as you practise. Tap 📌 to pin up to 3 goals to the home page.") : TT("药物组练过 10 题、掌握度 80% 点亮银闪；30 题、90% 升级金闪；50 题、95% 升级彩虹闪。点亮后 7 天没练光泽变淡、14 天氧化发暗，再练这组就重新擦亮。一章全部点亮得章节徽章；点 ★ 设为首页展示卡。", "10 answers at 80% makes a group silver; 30 at 90% gold; 50 at 95% rainbow. Cards dull after 7 idle days and tarnish after 14 — practise the group to polish them. Light a whole chapter for its badge; tap ★ to show a card on the home page.")}</p></div>
+      <p style="color:var(--mute);margin:6px 0 0;max-width:66ch">${tab === "ach" ? TT("练得越多解锁越多：连击、满分、打卡、全图鉴……点 📌 可以把想追的成就钉到首页（最多 3 个）。", "Unlock more as you practise. Tap 📌 to pin up to 3 goals to the home page.") : TT("药物组练过 10 题、掌握度 80% 点亮银闪；30 题、90% 升级金闪；50 题、95% 升级幻彩闪。点亮后 7 天没练光泽变淡、14 天氧化发暗，再练这组就重新擦亮。一章全部点亮得章节徽章；点 ★ 设为首页展示卡。", "10 answers at 80% makes a group silver; 30 at 90% gold; 50 at 95% iridescent. Cards dull after 7 idle days and tarnish after 14 — practise the group to polish them. Light a whole chapter for its badge; tap ★ to show a card on the home page.")}</p></div>
       <div class="tabs" role="tablist"><button class="tab" data-t="ach" aria-selected="${tab === "ach"}">${TT("成就", "Achievements")} ${n}/${ACH.length}</button><button class="tab" data-t="col" aria-selected="${tab === "col"}">${TT("闪卡", "Shiny cards")} ${sh}/${G.length}</button></div></div>
     ${tab === "ach" ? `<div class="ach-sum"><div><b>${n}</b><span>/ ${ACH.length} ${TT("个成就", "unlocked")}</span></div>
         <div class="ach-wk"><b>${c.streak}</b><span>${TT("天连续打卡", "day streak")}</span>${weekDots(wk)}<small>${TT(`本周 ${wk.n} / ${wk.goal} 天 · 每周可以休息 3 天不断签`, `This week ${wk.n} / ${wk.goal} days · up to 3 rest days a week won't break it`)}</small></div>

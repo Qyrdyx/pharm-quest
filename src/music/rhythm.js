@@ -92,7 +92,7 @@ export function rhyStart(track, onEnd) {
   if (!ensureAudio()) return null;
   rhyStop(true);
   const c = AU.ctx, b = makeBus(); Object.assign(RHY, b);
-  RHY.track = track; RHY.beat = 60 / track.bpm; RHY.d16 = RHY.beat / 4; RHY.level = 0; RHY.combo = 0; RHY.floors = []; RHY.onEnd = onEnd;
+  RHY.track = track; RHY.beat = 60 / track.bpm; RHY.d16 = RHY.beat / 4; RHY.level = 0; RHY.combo = 0; RHY.heat = 0; RHY.floors = []; RHY.onEnd = onEnd;
   RHY.t0 = c.currentTime + 0.35 + 4 * RHY.beat; RHY.step = 0; RHY.next = RHY.t0; RHY.total = track.bars * 16;
   for (let k = 0; k < 4; k++) click(RHY.bus, RHY.t0 - (4 - k) * RHY.beat, k === 0);
   RHY.endT = RHY.t0 + RHY.total * RHY.d16;
@@ -101,7 +101,7 @@ export function rhyStart(track, onEnd) {
 }
 function sched() {
   const c = AU.ctx; if (!c || !RHY.track) return;
-  while (RHY.next < c.currentTime + 0.25 && RHY.step < RHY.total) { if (RHY.step % 16 === 0) barAuto(RHY.step / 16, RHY.next); RHY.track.play(RHY.step, RHY.next, RHY.d16, RHY.layers); RHY.step++; RHY.next += RHY.d16; }
+  while (RHY.next < c.currentTime + 0.25 && RHY.step < RHY.total) { if (RHY.step % 16 === 0) barAuto(RHY.step / 16, RHY.next); RHY.track.play(RHY.step, RHY.next, RHY.d16, RHY.layers); heatPlay(RHY.step, RHY.next, RHY.d16); RHY.step++; RHY.next += RHY.d16; }
   if (RHY.step >= RHY.total && c.currentTime > RHY.endT + 1.2) { const f = RHY.onEnd; RHY.onEnd = null; clearInterval(RHY.timer); RHY.timer = 0; if (f) f(); }
 }
 export function rhyStop(quiet) {
@@ -126,6 +126,52 @@ export async function rhyRender(track, vol = 0.7) {
   fill(0.95);
   for (let k = 0.5; k < sec - 0.5; k += 0.5) { const at = k; oc.suspend(at).then(() => { fill(at + 0.75); oc.resume(); }); }
   const out = await oc.startRendering(); Object.assign(RHY, saved.R); return out;
+}
+
+/* ---------- 舞台升温（倍率 ×4 之后的热度）----------
+ * 热度 1「燃起来了」：每两小节末尾一段吉他即兴小段（用这一小节的和弦音往上爬，再落回根音）；
+ * 热度 2「全场沸腾」：每 8 小节开头一阵观众欢呼，每个乐句末尾一声「嘿！」；
+ * 热度 3「摇滚之神」：每两小节开头加一下镲片重音。
+ * 都在曲子本身之上加，走侧链（底鼓一响会被压一下），和曲子的段落无关；热度降下来就不再排新的音。 */
+export function rhyHeat(h) { RHY.heat = Math.max(0, Math.min(3, h | 0)); }
+/* 升级 / 每 16 连击的一下点缀：镲片 + 低音冲击（热度 2 以上再加一阵欢呼） */
+export function rhyHeatHit(h) {
+  const c = AU.ctx, d = RHY.duck; if (!c || !d || !RHY.track) return;
+  const t = Math.max(c.currentTime + 0.01, RHY.next);
+  crash(d, t, 0.2); if (h >= 3) crash(d, t + 0.012, 0.12);
+  tone(d, t, 90, 0.5, { vol: 0.22, glide: 45, glideT: 0.3, d: 0.45 });
+  if (h >= 2) cheer(d, t, RHY.beat * 6, 0.07);
+}
+/* 观众：好几层不同频段的噪声，慢慢涌起再退下，左右散开 */
+function cheer(d, t, dur, v = 0.06) {
+  [[900, -0.6], [1500, 0.5], [2400, -0.2], [3400, 0.3]].forEach(([f, pan], k) => {
+    const c = C(), s = c.createBufferSource(); s.buffer = AU.noise; s.loop = true;
+    const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = 1.1;
+    const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = 5 + k * 1.7; lg.gain.value = f * 0.12; lfo.connect(lg); lg.connect(bp.frequency);   // 起伏 → 像很多人在喊
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v * (k ? 0.7 : 1), t + dur * 0.25); g.gain.setTargetAtTime(0.0001, t + dur * 0.55, dur * 0.15);
+    const p = c.createStereoPanner(); p.pan.value = pan;
+    s.connect(bp); bp.connect(g); g.connect(p); p.connect(d); s.start(t, (k * 0.37 + t * 3.1) % 0.8); s.stop(t + dur + 0.6); lfo.start(t); lfo.stop(t + dur + 0.6); });
+}
+/* 一群人喊「嘿！」：几个略微错开的人声（锯齿 + 元音共振峰），音高往下滑 */
+function hey(d, t, v = 0.05) {
+  [[-0.5, 0, 205], [0.45, 0.009, 228], [0, 0.017, 182], [-0.2, 0.024, 250]].forEach(([pan, dl, f0]) => {
+    const c = C(), o = c.createOscillator(); o.type = "sawtooth"; const tt = t + dl;
+    o.frequency.setValueAtTime(f0 * 1.15, tt); o.frequency.exponentialRampToValueAtTime(f0 * 0.82, tt + 0.22);
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, tt); g.gain.linearRampToValueAtTime(v, tt + 0.02); g.gain.setTargetAtTime(0.0001, tt + 0.12, 0.05);
+    const p = c.createStereoPanner(); p.pan.value = pan; g.connect(p); p.connect(d);
+    [[650, 6, 1], [1700, 8, 0.6], [2600, 9, 0.35]].forEach(([ff, q, a]) => { const b = c.createBiquadFilter(); b.type = "bandpass"; b.frequency.value = ff; b.Q.value = q; const ga = c.createGain(); ga.gain.value = a * 3; o.connect(b); b.connect(ga); ga.connect(g); });
+    o.start(tt); o.stop(tt + 0.45); });
+  noise(d, t, 0.05, { type: "bandpass", f: 2600, q: 1, vol: v * 0.8, decay: 0.05 });   // 「嘿」开头的气声
+}
+/* 吉他即兴：4 个十六分音符往上爬、最后一个长音（失真主音），每次换一种走法 */
+const LICKS = [[0, 1, 2, 3], [1, 2, 3, 2], [0, 2, 1, 3], [2, 1, 2, 3]];
+function heatPlay(s, t, d) {
+  const h = RHY.heat, L = RHY.duck, tr = RHY.track; if (!h || !L || !tr) return;
+  const bar = Math.floor(s / 16), i = s % 16, ch = tr.chord(bar), top = ch.length >= 4 ? ch : [...ch, ch[0] + 12];
+  if (bar % 2 === 1 && i >= 12) { const k = LICKS[(bar >> 1) % LICKS.length][i - 12], m = top[k % top.length] + 12;
+    gtrLead(L, t, m > 84 ? m - 12 : m, d * (i === 15 ? 3.2 : 0.95), 0.032); }
+  if (h >= 2) { if (bar % 8 === 0 && i === 0) cheer(L, t, RHY.beat * 8, 0.05); if (bar % 4 === 3 && i === 12) hey(L, t, 0.045); }
+  if (h >= 3 && bar % 2 === 0 && i === 0) crash(L, t, 0.16);
 }
 
 /* ---------- 基础发声单元 ---------- */

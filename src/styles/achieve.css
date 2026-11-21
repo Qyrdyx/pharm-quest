@@ -1,4 +1,4 @@
-/* 药理闯关 · 成就页、闪卡（银 / 金 / 彩虹镭射）、新闪卡亮相、彩蛋成就
+/* 药理闯关 · 成就页、闪卡（银 / 金 / 幻彩全息）、新闪卡亮相、彩蛋成就
  * 由 src/pages/achieve.js 使用；以前和设置页的样式放在一起 */
 /* ---------- 成就与收集 ---------- */
 .ach-toast{position:fixed;top:72px;right:16px;z-index:120;display:flex;gap:12px;align-items:center;max-width:min(360px,calc(100vw - 32px));padding:12px 16px;border-radius:16px;cursor:pointer;
@@ -42,7 +42,7 @@
 @keyframes shinySweep{0%{background-position:150% 0}60%,100%{background-position:-100% 0}}
 .hcell.shiny{overflow:hidden;box-shadow:inset 0 0 0 2px #f4bf4f,0 0 12px #f4bf4f80}
 body.eco-holo .col-card.shiny,body.eco-holo .col-card.shiny::after,body.eco-holo .hcell.shiny::after{animation:none}
-/* ---------- 镭射闪卡（银 / 金 / 彩虹）---------- */
+/* ---------- 镭射闪卡（银 / 金 / 幻彩）---------- */
 .col-card.holo{--mx:50%;--my:50%;--rx:0deg;--ry:0deg;--tc:#c7d2dc;border:1.5px solid var(--tc);background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 18%,var(--bench)),var(--bench) 60%);
   transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out,box-shadow .25s;box-shadow:0 0 0 1px #0004,0 6px 18px #0006,0 0 14px color-mix(in srgb,var(--tc) 45%,transparent);isolation:isolate}
 .col-card.holo.hov{transition:transform .06s linear,box-shadow .25s;box-shadow:0 0 0 1px #0004,0 14px 30px #0008,0 0 24px color-mix(in srgb,var(--tc) 70%,transparent);z-index:2}
@@ -50,12 +50,10 @@ body.eco-holo .col-card.shiny,body.eco-holo .col-card.shiny::after,body.eco-holo
 .col-card.holo b{color:var(--paper)}
 .col-card.holo .col-m{color:var(--tc)}
 .col-card.t2{--tc:#f4bf4f}
-.col-card.t3{--tc:#ff9ff3}
 .holo-foil,.holo-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1}
 .holo-foil{mix-blend-mode:color-dodge;opacity:.42;background-size:300% 300%;background-position:var(--mx) var(--my);
   background-image:repeating-linear-gradient(115deg,#9aa7b4 0%,#e9f1f8 6%,#7f8e9c 12%,#dfe8f0 18%,#9aa7b4 24%)}
 .col-card.t2 .holo-foil{opacity:.5;background-image:repeating-linear-gradient(115deg,#a8741a 0%,#ffe08a 6%,#c98f22 12%,#fff1b8 18%,#a8741a 24%)}
-.col-card.t3 .holo-foil{opacity:.62;background-image:repeating-linear-gradient(115deg,#ff6b81 0%,#ffd166 7%,#5fd6a8 14%,#86cbff 21%,#c56cf0 28%,#ff6b81 35%),radial-gradient(circle,#fff 0 1px,transparent 1.6px);background-size:300% 300%,14px 14px}
 .holo-glare{mix-blend-mode:overlay;opacity:0;background:radial-gradient(circle at var(--mx) var(--my),#fffc 0%,#fff6 18%,transparent 48%);transition:opacity .2s}
 .col-card.holo.hov .holo-glare{opacity:1}
 .col-card.holo:not(.hov) .holo-foil{animation:holoDrift 6s ease-in-out infinite alternate}
@@ -65,7 +63,7 @@ body.eco-holo .col-card.shiny,body.eco-holo .col-card.shiny::after,body.eco-holo
 body.eco-holo .col-card.holo .holo-foil{animation:none}
 .hcell.shiny.t2{box-shadow:inset 0 0 0 2px #f4bf4f,0 0 14px #f4bf4fa0}
 .hcell.shiny.t1{box-shadow:inset 0 0 0 2px #c7d2dc,0 0 10px #c7d2dc80}
-.hcell.shiny.t3{box-shadow:inset 0 0 0 2px #ff9ff3,0 0 16px #ff9ff3b0}
+.hcell.shiny.t3{box-shadow:inset 0 0 0 2px #c9b8ff,0 0 16px #8b7bffb0}
 /* 新闪卡亮相 */
 .cb-reveal{position:fixed;inset:0;z-index:130;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#050d10cc;backdrop-filter:blur(3px);cursor:pointer;animation:cbFade .3s ease}
 .cb-reveal.out{animation:achOut .3s ease-in forwards}
@@ -186,17 +184,11 @@ body.eco-holo .col-card.holo .holo-foil{animation:none}
 .col-back .col-more{font-size:10.5px;color:var(--mute)}
 .col-back .col-hint{margin-top:auto;padding-top:4px;font-size:10px;color:var(--faint,var(--mute));opacity:.8}
 
-/* 三档材质：银 = 拉丝金属边；金 = 加厚浮雕金边 + 四角小钻；彩虹 = 棱镜边 + 星光 */
+/* 三档材质：银 = 拉丝金属边；金 = 加厚浮雕金边 + 四角小钻；幻彩 = 暗场全息（见文件末尾） */
 .col-card.holo.t1{border:2px solid transparent;background:linear-gradient(160deg,color-mix(in srgb,#c7d2dc 16%,var(--bench)),var(--bench) 60%) padding-box,repeating-linear-gradient(115deg,#7f8b97 0 2px,#eef5fa 2px 3px,#a9b5c1 3px 5px,#d7e0e8 5px 6px) border-box}
 .col-card.holo.t2{border:3px solid transparent;box-shadow:inset 0 0 0 1px #ffe08a66,0 0 14px #f4bf4f22;
   background:radial-gradient(circle at 9px 9px,#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at calc(100% - 9px) 9px,#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at 9px calc(100% - 9px),#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#fff1b8 0 1.6px,#c98f22 2.2px,transparent 3px) padding-box,
   linear-gradient(160deg,color-mix(in srgb,#f4bf4f 18%,var(--bench)),var(--bench) 62%) padding-box,linear-gradient(135deg,#7a4e0e,#ffe08a 22%,#b8801f 42%,#fff1b8 58%,#a8741a 78%,#ffd166) border-box}
-.col-card.holo.t3{border:3px solid transparent;box-shadow:0 0 18px #ff9ff333;
-  background:linear-gradient(160deg,color-mix(in srgb,#ff9ff3 14%,var(--bench)),var(--bench) 62%) padding-box,conic-gradient(from 210deg,#ff6b81,#ffd166,#5fd6a8,#86cbff,#c56cf0,#ff6b81) border-box}
-.col-card.holo.t3 .holo-foil::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(circle at 18% 22%,#fff 0 1.2px,transparent 2px),radial-gradient(circle at 72% 30%,#fff 0 1px,transparent 1.8px),radial-gradient(circle at 40% 78%,#fff 0 1.4px,transparent 2.2px),radial-gradient(circle at 86% 70%,#fff 0 1px,transparent 1.8px);animation:sparkTw 2.6s ease-in-out infinite alternate}
-@keyframes sparkTw{0%{opacity:.25}100%{opacity:1}}
-body.eco-holo .col-card.holo.t3 .holo-foil::after{animation:none;opacity:.7}
 
 /* 自然旧化：7 天没练光泽变淡；14 天边框失去金属光泽、卡面发灰泛黄、镭射消失（不再是一块块斑点） */
 .col-card.holo.f2::after{content:none}
@@ -229,3 +221,65 @@ body.eco-holo .col-card.holo.t3 .holo-foil::after{animation:none;opacity:.7}
 .rv-card .rv-shine::before{content:"";position:absolute;top:-25%;bottom:-25%;left:-60%;width:45%;background:linear-gradient(105deg,transparent,#ffffffb8 50%,transparent);transform:translateX(0) rotate(8deg);will-change:transform;animation:rvSweep .85s .6s ease-out forwards}
 @keyframes rvSweep{to{transform:translateX(420%) rotate(8deg)}}
 @media (prefers-reduced-motion:reduce){.rv-card .rv-patina{animation-duration:.01s}.rv-card .rv-shine{display:none}}
+
+/* ================= 幻彩闪：暗场全息 =================
+   近黑的底透出一点章节色；一束虚拟光在卡面上缓慢游走（鼠标放上去时跟着鼠标）；
+   彩虹衍射纹只在光照附近、并且只沿着“放大的章节图腾（细线）+ 三条长流线”显现，没有密集的小图形；
+   图腾由 holoCard 按章节图标生成，放在 --emb 里。7 天没练只剩冷金属光，14 天像压印在暗灰卡面上。 */
+@property --lx{syntax:"<percentage>";inherits:true;initial-value:30%}
+@property --ly{syntax:"<percentage>";inherits:true;initial-value:25%}
+@property --ang{syntax:"<angle>";inherits:true;initial-value:0deg}
+
+.col-card.holo.t3{--tc:#e6dcff;--chc:#7b6cff;--emb:linear-gradient(transparent,transparent);--flow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23000' stroke-width='.9' stroke-linecap='round'%3E%3Cpath d='M-10 28 C25 8 62 52 110 22'/%3E%3Cpath d='M-10 62 C30 44 66 88 110 56'/%3E%3Cpath d='M-10 98 C34 78 64 118 110 90'/%3E%3C/g%3E%3C/svg%3E");border:1.5px solid transparent;
+  background:radial-gradient(130% 95% at var(--lx) var(--ly),color-mix(in srgb,var(--chc) 26%,#0c0a13) 0%,#0a0911 46%,#040308 100%) padding-box,
+             conic-gradient(from var(--ang),#8d96a0,#f3f6fa,#7f8892,#ff8fe0,#8fe9ff,#ffe08a,#c9d1d9,#8d96a0) border-box;
+  box-shadow:0 0 0 1px #000c,0 10px 26px #000c,0 0 24px color-mix(in srgb,var(--chc) 32%,transparent);
+  animation:iriLX 7.3s ease-in-out infinite alternate,iriLY 5.1s ease-in-out infinite alternate,iriAng 14s linear infinite}
+@keyframes iriLX{from{--lx:8%}to{--lx:92%}}
+@keyframes iriLY{from{--ly:6%}to{--ly:94%}}
+@keyframes iriAng{to{--ang:360deg}}
+.col-card.holo.t3.hov{animation:iriAng 14s linear infinite;--lx:var(--mx);--ly:var(--my)}
+
+/* 衍射层：光谱细线 × 光照范围 × 章节纹样 */
+.col-card.holo.t3 .holo-foil{opacity:.95;mix-blend-mode:screen;animation:none;
+  background:repeating-linear-gradient(112deg,#ff3fd0 0,#ffcf3f 9px,#3fff8c 18px,#3fd0ff 27px,#7a3fff 36px,#ff3fd0 45px);
+  background-size:220% 220%;background-position:calc(var(--lx) * 1.6) calc(var(--ly) * 1.2);
+  -webkit-mask-image:radial-gradient(circle at var(--lx) var(--ly),#000 0%,rgba(0,0,0,.72) 30%,rgba(0,0,0,.22) 62%,rgba(0,0,0,.08) 85%),var(--emb),var(--flow);
+  -webkit-mask-size:100% 100%,135% auto,100% 100%;-webkit-mask-position:0 0,calc(100% + 58px) calc(100% + 52px),0 0;-webkit-mask-repeat:no-repeat;
+  -webkit-mask-composite:source-in,source-over;mask-composite:intersect,add}
+/* 只留三颗稀疏的星光，不做密集细闪 */
+.col-card.holo.t3 .holo-foil::before{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,#fff,transparent) 22% 30%/9px 9px no-repeat,radial-gradient(closest-side,#fff,transparent) 78% 18%/7px 7px no-repeat,radial-gradient(closest-side,#fff,transparent) 62% 70%/8px 8px no-repeat;
+  -webkit-mask-image:radial-gradient(circle at var(--lx) var(--ly),#000 0%,transparent 55%);animation:iriTw 2.4s ease-in-out infinite alternate}
+@keyframes iriTw{from{opacity:.25}to{opacity:1}}
+.col-card.holo.t3 .holo-foil::after{content:none}
+/* 高光：柔和的白光团跟着光源 */
+.col-card.holo.t3 .holo-glare{opacity:.75;mix-blend-mode:soft-light;background:radial-gradient(circle at var(--lx) var(--ly),#fff 0%,#fff8 10%,transparent 38%)}
+/* 文字与图标：清楚，带一点印刷色差 */
+.col-card.holo.t3 b{color:#fff;text-shadow:0 1px 2px #000}
+.col-card.holo.t3 .col-ico{color:#fff;opacity:1;filter:drop-shadow(1.2px 0 0 #ff4fd8b0) drop-shadow(-1.2px 0 0 #4fd8ffb0) drop-shadow(0 0 7px color-mix(in srgb,var(--chc) 70%,transparent))}
+.col-card.holo.t3 .col-m{color:#fff;text-shadow:1.5px 0 #ff4fd8a0,-1.5px 0 #4fd8ffa0}
+.col-card.holo.t3 .holo-tag{color:#fff;background:#0b0a12;box-shadow:inset 0 0 0 1px #ffffff40;text-shadow:1px 0 #ff4fd8b0,-1px 0 #4fd8ffb0}
+
+/* 幻彩闪的旧化：7 天没练，彩虹退去，只剩冷金属光；14 天，光也没了，图腾像压印在暗灰卡面上 */
+.col-card.holo.t3.f1 .holo-foil{opacity:.5;filter:grayscale(1) brightness(1.1)}
+.col-card.holo.t3.f1{background:radial-gradient(130% 95% at var(--lx) var(--ly),#23262c 0%,#121418 50%,#08090b 100%) padding-box,conic-gradient(from var(--ang),#5b636c,#c9d0d7,#4e555d,#9aa2ab,#5b636c) border-box;box-shadow:0 0 0 1px #000c,0 10px 26px #000c}
+.col-card.holo.t3.f1 .col-ico{filter:drop-shadow(0 0 4px #ffffff40)}
+.col-card.holo.t3.f1 .col-m{text-shadow:none;color:#c9d0d7}
+.col-card.holo.t3.f2{animation:none;box-shadow:none;background:linear-gradient(165deg,#2c2b29,#1c1b1a 70%) padding-box,linear-gradient(135deg,#4d4a45,#77716a 40%,#4a4641 70%,#6a655e) border-box}
+.col-card.holo.t3.f2 .holo-foil{display:block!important;opacity:.2;mix-blend-mode:normal;background:#cfc6b6;-webkit-mask-image:var(--emb),var(--flow);-webkit-mask-size:135% auto,100% 100%;-webkit-mask-position:calc(100% + 58px) calc(100% + 52px),0 0;-webkit-mask-repeat:no-repeat;-webkit-mask-composite:source-over;mask-composite:add}
+.col-card.holo.t3.f2 .holo-foil::before,.col-card.holo.t3.f2 .holo-glare{display:none}
+.col-card.holo.t3.f2 .col-ico{color:#a69a84;filter:none;opacity:.7}
+.col-card.holo.t3.f2 .col-m{color:#c9b48c;text-shadow:none}
+.col-card.holo.t3.f2 b{color:#d8d0c2}
+.col-card.holo.t3.f2 .holo-tag{color:#d8d0c2;text-shadow:none}
+/* 纹样密的地方，小字也要看得清：文字下垫一层很淡的暗影 */
+.col-card.holo.t3 .col-foot,.col-card.holo.t3 .col-top{text-shadow:0 0 4px #000,0 0 8px #000c,0 1px 2px #000}
+.col-card.holo.t3 .col-foot small,.col-card.holo.t3 .col-nt{color:#d6d9e0}
+
+.col-card.holo.t3.ch-I{--chc:#3fd0ff}.col-card.holo.t3.ch-II{--chc:#8a5cff}.col-card.holo.t3.ch-III{--chc:#ffcf3f}.col-card.holo.t3.ch-IV{--chc:#ff4f6d}
+.col-card.holo.t3.ch-V{--chc:#3fffc0}.col-card.holo.t3.ch-VI{--chc:#3fff8c}.col-card.holo.t3.ch-VII{--chc:#ff9a3f}.col-card.holo.t3.ch-VIII{--chc:#c84fff}
+
+/* 省电“闪卡镭射静止”、系统“减少动画”：光停在左上方，不再游走 */
+body.eco-holo .col-card.holo.t3,body.eco-holo .col-card.holo.t3 .holo-foil::before{animation:none}
+@media (prefers-reduced-motion:reduce){.col-card.holo.t3,.col-card.holo.t3 .holo-foil::before{animation:none}}

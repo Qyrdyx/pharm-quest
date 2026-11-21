@@ -3,3 +3,4 @@ dist/
 dist-dev/
 tests/_*
 *.log
+预览-*/

@@ -11,7 +11,7 @@ export const ECO_ITEMS = [
   ["ecg", "画面降到 20 帧", "20 fps drawing", "监护仪心电图等画布从 30 帧降到 20 帧", "The heart monitor and other canvases draw at 20 fps instead of 30"],
   ["anim", "循环小动画降帧", "Slower looping animations", "病人呼吸、点滴、心跳、警报这类循环动画按 20 帧推进", "Breathing, drips, heartbeats and alarms step at 20 fps"],
   ["deco", "关掉装饰动画", "No decorative animations", "吉祥物晃动、音乐跳动条、病房灯光闪烁这些纯装饰的动画停掉", "Mascot wobble, music bars and ward lights stop"],
-  ["holo", "闪卡镭射静止", "Still holo cards", "闪卡的镭射流光、彩虹闪星光不再自动流动（鼠标划过仍有反光）", "Holo foil and rainbow sparkles stop drifting (still react to the pointer)"],
+  ["holo", "闪卡镭射静止", "Still holo cards", "闪卡的镭射流光、幻彩闪的游走光不再自动流动（鼠标划过仍有反光）", "Holo foil and iridescent light stop drifting (still react to the pointer)"],
   ["fx", "连击特效最高到「中」", "Combo effects capped at Medium", "特效强度选了「高」也按「中」显示", "Effects set to High show as Medium"]
 ];
 /* 省电模式里某一项是否生效：总开关开着、这一项没被单独关掉 */

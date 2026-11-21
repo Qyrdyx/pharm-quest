@@ -167,3 +167,47 @@ body.eco-deco .rock-art .ecg{animation:none;stroke-dashoffset:0}
 .rh-newach small{display:block;font-weight:500;color:var(--mute);font-size:11.5px}
 .rh-wr{max-width:520px;margin:8px auto;text-align:left;font-size:13px}
 .rh-wr summary{cursor:pointer;color:var(--mute)}
+/* 倍率升级的大字移到画面上方（只短暂压在分数栏上），不再挡住中间的传送带和抽屉 */
+.rh-mup{justify-content:flex-start;padding-top:66px}
+.rh-mup b{font-size:62px;line-height:1}
+.rh-mup small{font-size:14px;margin-top:2px}
+.rh-mup::before{background:radial-gradient(ellipse 55% 24% at 50% 12%,color-mix(in srgb,var(--c,#7fe3ff) 14%,transparent),transparent 72%)}
+@media (max-width:640px){.rh-mup{padding-top:54px}.rh-mup b{font-size:46px}}
+
+/* ---------- 舞台升温（倍率 ×4 之后的热度）----------
+   1 燃起来了：判定线变粗、金色，带一点往上飘的火光；传送带边金色
+   2 全场沸腾：传送带两侧两束舞台灯光，缓慢来回扫（不闪）
+   3 摇滚之神：判定线和边框换成缓慢流动的幻彩（心电条和音浪在脚本里画） */
+.rh-stage{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity 1.2s}
+.rh-stage i{position:absolute;bottom:-10%;width:42%;height:130%;transform-origin:50% 100%;
+  background:linear-gradient(0deg,color-mix(in srgb,var(--sc,#ffc94d) 26%,transparent),transparent 82%);
+  clip-path:polygon(44% 100%,56% 100%,100% 0,0 0);filter:blur(6px);mix-blend-mode:screen}
+.rh-stage i:first-child{left:-8%;animation:rhSpotL 7s ease-in-out infinite alternate}
+.rh-stage i:last-child{right:-8%;--sc:#7fe3ff;animation:rhSpotR 8.5s ease-in-out infinite alternate}
+@keyframes rhSpotL{from{transform:rotate(-24deg)}to{transform:rotate(18deg)}}
+@keyframes rhSpotR{from{transform:rotate(22deg)}to{transform:rotate(-20deg)}}
+.rh-game[data-heat="2"] .rh-stage,.rh-game[data-heat="3"] .rh-stage{opacity:1}
+.rh-game[data-heat="3"] .rh-stage i:last-child{--sc:#ff9ff3}
+
+.rh-game[data-heat="1"] .rh-line,.rh-game[data-heat="2"] .rh-line{height:6px;bottom:22px;background:linear-gradient(90deg,transparent,#ffb03a 18%,#fff1b8 50%,#ffb03a 82%,transparent);box-shadow:0 0 16px #ffb03acc,0 -6px 18px #ff7a1a66}
+.rh-game[data-heat="1"] .rh-line::after,.rh-game[data-heat="2"] .rh-line::after,.rh-game[data-heat="3"] .rh-line::after{content:"";position:absolute;left:10%;right:10%;bottom:100%;height:26px;pointer-events:none;
+  background:radial-gradient(ellipse 50% 100% at 50% 100%,#ff9a3a55,transparent 70%);transform-origin:50% 100%;animation:rhFlame 1.6s ease-in-out infinite alternate}
+@keyframes rhFlame{from{transform:scaleY(.75);opacity:.7}to{transform:scaleY(1.15);opacity:1}}
+.rh-game[data-heat="1"] .rh-belt,.rh-game[data-heat="2"] .rh-belt{border-color:color-mix(in srgb,#ffc94d 55%,var(--line));box-shadow:0 0 18px #ffb03a33}
+.rh-game[data-heat="3"] .rh-line{height:6px;bottom:22px;background:linear-gradient(90deg,transparent,#ff7ad9,#ffd36b,#7dffb5,#7fe3ff,#b48bff,transparent);background-size:200% 100%;animation:rhIri 3s linear infinite;box-shadow:0 0 18px #ffffff66}
+.rh-game[data-heat="3"] .rh-line::after{background:radial-gradient(ellipse 50% 100% at 50% 100%,#c9b8ff55,transparent 70%)}
+.rh-game[data-heat="3"] .rh-belt{border-color:#c9b8ff;box-shadow:0 0 20px #b48bff40}
+@keyframes rhIri{to{background-position:200% 0}}
+.rh-game[data-heat="1"] .rh-combo,.rh-game[data-heat="2"] .rh-combo{color:#ffc94d2a}
+.rh-game[data-heat="3"] .rh-combo{color:#c9b8ff30}
+
+/* 升温提示：和倍率提示同一个位置（顶部），停留更久一点 */
+.rh-mup.heat{animation-duration:1.25s}
+.rh-mup.heat b{font-size:52px;letter-spacing:.04em}
+.rh-mup.h1{--c:#ffb03a}.rh-mup.h2{--c:#ffd36b}.rh-mup.h3{--c:#c9b8ff}
+.rh-mup.h3 b{background:linear-gradient(90deg,#ff9fe0,#ffe08a,#9dffc4,#8fe9ff,#b4a6ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 3px 0 #0a1a20)}
+@media (max-width:640px){.rh-mup.heat b{font-size:38px}}
+.rh-heatb.h1{color:#ffb03a}.rh-heatb.h2{color:#ffd36b}.rh-heatb.h3{color:#c9b8ff}
+
+body.eco-fx .rh-stage i,body.eco-fx .rh-line::after,body.eco-fx .rh-game[data-heat="3"] .rh-line{animation:none}
+@media (prefers-reduced-motion:reduce){.rh-stage i,.rh-line::after,.rh-game[data-heat="3"] .rh-line{animation:none}}

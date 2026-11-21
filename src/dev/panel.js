@@ -127,6 +127,8 @@ function open() {
     <div class="dev-tg${window.PG_DEV.rhAuto ? " on" : ""}" id="dvRhAuto"><span>${TT("自动打（开一局后自己按）", "Auto-play (presses for you)")}</span><i></i></div>
     <div class="dev-row">${TT("按键误差", "Timing error")}：${[0, 30, 70, 120, 200].map(v => `<button class="ibtn${(window.PG_DEV.rhJitter ?? 30) === v ? " on" : ""}" data-rhj="${v}">±${v}ms</button>`).join("")}</div>
     <div class="dev-row" style="margin-top:6px">${TT("放对的比例", "Accuracy")}：${[100, 85, 60].map(v => `<button class="ibtn${(window.PG_DEV.rhAcc ?? 100) === v ? " on" : ""}" data-rha="${v}">${v}%</button>`).join("")}</div>
+    <div class="dev-row" style="margin-top:6px">${TT("开局连击", "Starting combo")}：${[0, 14, 22, 30].map(v => `<button class="ibtn${(window.PG_DEV.rhCombo ?? 0) === v ? " on" : ""}" data-rhc="${v}">${v}</button>`).join("")}</div>
+    <p>${TT("开局连击设成 14 / 22 / 30，再放对两下就能看到「燃起来了 / 全场沸腾 / 摇滚之神」。", "Set a starting combo of 14 / 22 / 30 to see each stage-heat level after two more hits.")}</p>
     <p>${TT("开发者版里每次判定会显示时间差（+12ms = 晚了 12 毫秒）。±50 ms 内算完美，±100 ms 内算不错，±300 ms 内算偏了。", "The dev build shows the timing error on each judgement (+12ms = 12 ms late). Within ±50 ms is Perfect, ±100 ms Good, ±300 ms Off-time.")}</p>
 
     <h3>${TT("音效试听（新版 / 旧版对比）", "Sound check (new vs old)")}</h3>
@@ -151,7 +153,7 @@ function open() {
     <h3>${TT("特效预览", "Effect preview")}</h3>
     <div class="dev-row">${QUIZ_TIERS.map((t, i) => `<button class="ibtn" data-pq="${i}">${TT(t[1], t[2])}</button>`).join("")}</div>
     <div class="dev-row" style="margin-top:6px"><button class="ibtn" data-pv="break">${TT("连击中断", "Combo break")}</button><button class="ibtn" data-pv="r3">${TT("完美清盘 3 星", "Perfect 3★")}</button><button class="ibtn" data-pv="r2">${TT("2 星", "2★")}</button><button class="ibtn" data-pv="r1">${TT("1 星", "1★")}</button><button class="ibtn" data-pv="toast">${TT("成就提示", "Achievement toast")}</button><button class="ibtn" data-pv="rain">${TT("满屏礼花", "Confetti")}</button><button class="ibtn" data-pv="perfect">${TT("全对大结局", "Perfect finale")}</button></div>
-    <div class="dev-row" style="margin-top:6px"><button class="ibtn" data-rv="1">${TT("开卡：银闪", "Reveal: silver")}</button><button class="ibtn" data-rv="2">${TT("开卡：金闪", "Reveal: gold")}</button><button class="ibtn" data-rv="3">${TT("开卡：彩虹闪", "Reveal: rainbow")}</button></div>
+    <div class="dev-row" style="margin-top:6px"><button class="ibtn" data-rv="1">${TT("开卡：银闪", "Reveal: silver")}</button><button class="ibtn" data-rv="2">${TT("开卡：金闪", "Reveal: gold")}</button><button class="ibtn" data-rv="3">${TT("开卡：幻彩闪", "Reveal: iridescent")}</button></div>
 
     <h3>${TT("成就", "Achievements")} <small class="dev-cnt">${PG.ACH.filter(a => got[a[0]]).length}/${PG.ACH.length}</small></h3>
     <p>${TT("逐个点“解锁”会弹出提示；“全部解锁”不弹提示，免得一下刷屏。", "Unlocking one shows its toast; Unlock all is silent so nothing floods the screen.")}</p>
@@ -159,7 +161,7 @@ function open() {
     <div class="dev-list">${PG.ACH.map(a => `<div class="dev-ach${got[a[0]] ? " got" : ""}"><b>${a[2]}</b><span>${esc(TT(a[3], a[4]))} <small>${TIER_N[a[1] - 1]}</small></span>${got[a[0]] ? `<button class="ibtn" data-lock="${a[0]}">${TT("撤销", "Lock")}</button>` : `<button class="ibtn" data-unlock="${a[0]}">${TT("解锁", "Unlock")}</button>`}</div>`).join("")}</div>
 
     <h3>${TT("闪卡", "Shiny cards")} <small>${shiny}/${G.length}</small></h3>
-    <div class="dev-row"><button class="ibtn" data-tier="1">${TT("前 6 组 → 银闪", "First 6 → silver")}</button><button class="ibtn" data-tier="2">${TT("前 6 组 → 金闪", "First 6 → gold")}</button><button class="ibtn" data-tier="3">${TT("前 6 组 → 彩虹闪", "First 6 → rainbow")}</button><button class="ibtn" data-tier="mix">${TT("银金彩虹各一些", "Mixed tiers")}</button></div>
+    <div class="dev-row"><button class="ibtn" data-tier="1">${TT("前 6 组 → 银闪", "First 6 → silver")}</button><button class="ibtn" data-tier="2">${TT("前 6 组 → 金闪", "First 6 → gold")}</button><button class="ibtn" data-tier="3">${TT("前 6 组 → 幻彩闪", "First 6 → iridescent")}</button><button class="ibtn" data-tier="mix">${TT("银金幻彩各一些", "Mixed tiers")}</button></div>
     <div class="dev-row" style="margin-top:6px"><button class="ibtn" data-sh="5">${TT("点亮前 5 组", "First 5")}</button><button class="ibtn" data-sh="20">${TT("点亮前 20 组", "First 20")}</button><button class="ibtn" data-sh="all">${TT("全部点亮", "All")}</button><button class="ibtn" data-sh="half">${TT("一半练过但没亮", "Half practised, not shiny")}</button><button class="ibtn" data-sh="none">${TT("全部清掉", "Clear")}</button></div>
     <div class="dev-row" style="margin-top:6px">${P.chapters.map(ch => `<button class="ibtn" data-shch="${esc(ch[0])}">${TT("点亮", "Light")} ${esc(ch[0])}</button>`).join("")}</div>
 
@@ -183,6 +185,7 @@ function open() {
   pan.querySelectorAll("[data-aacc]").forEach(b => b.onclick = () => { window.PG_DEV.autoAcc = +b.dataset.aacc; saveDev(); SFX.click(); reopen(); });
 pan.querySelector("#dvRhAuto").onclick = () => { window.PG_DEV.rhAuto = !window.PG_DEV.rhAuto; saveDev(); SFX.click(); reopen(); };
   pan.querySelectorAll("[data-rhj]").forEach(b => b.onclick = () => { window.PG_DEV.rhJitter = +b.dataset.rhj; saveDev(); SFX.click(); reopen(); });
+  pan.querySelectorAll("[data-rhc]").forEach(b => b.onclick = () => { window.PG_DEV.rhCombo = +b.dataset.rhc; saveDev(); SFX.click(); reopen(); });
   pan.querySelectorAll("[data-rha]").forEach(b => b.onclick = () => { window.PG_DEV.rhAcc = +b.dataset.rha; saveDev(); SFX.click(); reopen(); });
   pan.querySelectorAll("[data-tg]").forEach(el => el.onclick = () => { const k = el.dataset.tg; window.PG_DEV[k] = !window.PG_DEV[k]; saveDev(); el.classList.toggle("on", window.PG_DEV[k]); SFX.click(); });
   const TL = { 1: { a: 12, c: 11 }, 2: { a: 32, c: 31 }, 3: { a: 60, c: 60 } };

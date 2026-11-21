@@ -17,7 +17,7 @@ import { fxLevel } from "../ui/combo.js";
 import { SFX } from "../music/sfx.js";
 import { AU } from "../music/engine.js";
 import { startMusic, stopMusic } from "../music/player.js";
-import { RHY, RHY_TRACKS, heardAt, heardNow, rhyClicks, rhyHit, rhyLevel, rhyLoad, rhyPress, rhyReady, rhyStart, rhyStop, rhyFloor } from "../music/rhythm.js";
+import { RHY, RHY_TRACKS, heardAt, heardNow, rhyClicks, rhyHit, rhyLevel, rhyLoad, rhyPress, rhyReady, rhyStart, rhyStop, rhyFloor, rhyHeat, rhyHeatHit } from "../music/rhythm.js";
 import { DEV, devOn } from "../core/dev.js";
 
 reg({ RH: () => RH }, { RH: v => { RH = v; } });
@@ -35,6 +35,13 @@ const KEY_LABEL = { 2: ["← / A", "→ / D"], 3: ["← / A", "↓ / S", "→ / 
 /* 连击门槛降低：连对 2 次加和弦、5 次加旋律、8 次全开；断了也至少保留“鼓 + 贝斯”，歌不会只剩鼓 */
 const levelOf = n => n >= 8 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1;
 const multOf = n => n >= 8 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1;
+/* 舞台升温：倍率封顶（×4）之后继续给连击里程碑。连击 16 → 热度 1、24 → 2、32 → 3，之后每 16 连击再庆祝一次；
+ * 每级额外加分 10% / 20% / 30%；断连击时热度只降一级（不清零），想升回去要重新连到那一级的门槛 */
+const HEAT_AT = [16, 24, 32];
+const HEAT_BONUS = [1, 1.1, 1.2, 1.3];
+const HEAT_NAME = [["", ""], ["燃起来了！", "On fire!"], ["全场沸腾", "Crowd goes wild"], ["摇滚之神", "Rock god"]];
+const HEAT_SUB = [["", ""], ["吉他即兴加入 · 分数 +10%", "Guitar licks join · +10% score"], ["观众欢呼 · 分数 +20%", "The crowd cheers · +20% score"], ["镲片重音 · 分数 +30%", "Cymbal accents · +30% score"]];
+const pts = base => Math.round(base * multOf(RH.streak) * HEAT_BONUS[RH.heat || 0]);
 const SLIP = 2;   // 连着失误 2 次才断连击；只失误 1 次连击保留（提示“小心”）
 const cal = () => typeof cfg.rhythmCal === "number" ? cfg.rhythmCal : 0.03;   // 没校准过：按 30 ms 的手指 / 触屏延迟估计
 
@@ -56,6 +63,8 @@ const RH_ACH = [
   ["c10", "热身完毕", "Warmed up", "一局里连击达到 10", "Reach a 10 combo", r => r.maxStreak >= 10],
   ["c25", "渐入佳境", "In the groove", "一局里连击达到 25", "Reach a 25 combo", r => r.maxStreak >= 25],
   ["band", "乐队全开", "Full band", "倍率升到 ×4，整个乐队都加进来", "Reach the ×4 multiplier with the full band", r => r.maxStreak >= 8],
+  ["wild", "全场沸腾", "Crowd goes wild", "一局里连击达到 24，观众沸腾", "Reach a 24 combo and get the crowd going", r => (r.maxHeat || 0) >= 2],
+  ["god", "摇滚之神", "Rock god", "一局里连击达到 32，热度升到最高", "Reach a 32 combo for the top stage heat", r => (r.maxHeat || 0) >= 3],
   ["clean", "零失误", "Clean set", "一首歌从头到尾没有放错、没有漏掉", "Finish a song with no wrong drops or misses", r => r.done && r.wrongN === 0 && r.miss === 0],
   ["fc", "全连", "Full combo", "一首歌从头到尾没断过连击", "Finish a song without ever breaking the combo", r => r.done && r.breaks === 0 && r.answered > 0],
   ["perfect", "节拍精准", "On the beat", "一首歌里八成以上是「完美」", "Get Perfect on at least 80% of a song", r => r.done && r.answered > 0 && r.perfect / r.answered >= 0.8],
@@ -179,11 +188,11 @@ export function startRhythm(ti = 0) {
       hb += step(bar);
     }
   }
-  RH = { tr, n, pills, sections, curSec: -1, front: 0, streak: 0, maxStreak: 0, score: 0, perfect: 0, good: 0, late: 0, miss: 0, wrongN: 0, offb: 0, correct: 0, answered: 0, wrongs: [], t0: 0, beat: 60 / tr.bpm, raf: 0, ended: false, el: {}, flash: [], ecgHits: [] };
+  RH = { tr, n, pills, sections, curSec: -1, front: 0, streak: 0, maxStreak: 0, score: 0, perfect: 0, good: 0, late: 0, miss: 0, wrongN: 0, offb: 0, correct: 0, answered: 0, wrongs: [], heat: 0, maxHeat: 0, t0: 0, beat: 60 / tr.bpm, raf: 0, ended: false, el: {}, flash: [], ecgHits: [] };
   show(`<div class="rh-game lanes-${n}">
       <div class="rh-hud"><div class="panel stat"><div class="k">SCORE</div><div class="v" id="rhScore">0</div></div><div class="panel stat rh-mult"><div class="k">${TT("倍率", "MULT")}</div><div class="v" id="rhMult">×1</div><small id="rhStreak">${TT("连击 0", "Combo 0")}</small></div><div class="panel stat"><div class="k">${TT("完美 / 不错 / 失误", "PERF / GOOD / MISS")}</div><div class="v rh-cnt" id="rhCnt">0 / 0 / 0</div></div></div>
       <canvas class="rh-ecg" id="rhEcg"></canvas>
-      <div class="rh-belt" id="rhBelt"><div class="rh-line"></div><div class="rh-judge" id="rhJudge"></div><div class="rh-ann" id="rhAnn"></div><div class="rh-combo" id="rhCombo"></div></div>
+      <div class="rh-belt" id="rhBelt"><div class="rh-stage" aria-hidden="true"><i></i><i></i></div><div class="rh-line"></div><div class="rh-judge" id="rhJudge"></div><div class="rh-ann" id="rhAnn"></div><div class="rh-combo" id="rhCombo"></div></div>
       <div class="rh-lanes" id="rhLanes">${Array.from({ length: n }, (_, i) => `<button class="rh-lane" data-lane="${i}"><span class="rh-k">${KEY_LABEL[n][i]}</span><b></b></button>`).join("")}</div>
       <div class="rh-foot"><span class="rh-count" id="rhCountIn"></span><button class="ibtn" id="rhQuit">${TT("结束本局", "End game")}</button></div>
     </div>`,
@@ -205,6 +214,7 @@ export function startRhythm(ti = 0) {
       if (!st) { toast(TT("这台设备没法播放声音，摇滚医生用不了", "Audio isn't available on this device")); return; }
       RH.t0 = st.t0; RH.beat = st.beat; rhyLevel(levelOf(0));   // 一开始就有鼓 + 贝斯
       labels();
+      if (DEV && window.PG_DEV && window.PG_DEV.rhCombo) { RH.streak = RH.maxStreak = window.PG_DEV.rhCombo; for (let h = 0; h < 3 && RH.streak >= HEAT_AT[h]; h++) setHeat(h + 1); rhyLevel(levelOf(RH.streak)); hud(); }   // 开发者版：从指定连击开始，直接看升温
       if (DEV && devOn("rhAuto")) autoPlay();
       RH.raf = requestAnimationFrame(frame); };
     if (rhyReady()) go(); else { RH.el.countIn.textContent = TT("加载乐器…", "Loading instruments…"); rhyLoad().then(go); }   // 采样还没解码完就等一下
@@ -247,10 +257,10 @@ function judge(p, lane, dt) {
   const ok = lane === p.o.ans, ad = Math.abs(dt), grade = !ok ? "wrong" : ad <= WIN.perfect ? "perfect" : ad <= WIN.good ? "good" : "late";
   const q = { ref: { drug: p.d }, options: p.o.options, ans: p.o.ans, type: "group" };
   if (ok) { RH.correct++;
-    if (grade === "late") { RH.late++; RH.err = 0; RH.streak++; RH.maxStreak = Math.max(RH.maxStreak, RH.streak); RH.score += 30 * multOf(RH.streak); rhyLevel(levelOf(RH.streak)); showJudge(dt < 0 ? TT("早了一点", "A bit early") : TT("晚了一点", "A bit late"), "late", dt); }   // 放对了但没踩准：照样算连击，只是分少
-    else { const m0 = multOf(RH.streak); RH[grade]++; RH.err = 0; RH.streak++; RH.maxStreak = Math.max(RH.maxStreak, RH.streak); RH.score += (grade === "perfect" ? 100 : 60) * multOf(RH.streak); rhyLevel(levelOf(RH.streak));
+    if (grade === "late") { RH.late++; RH.err = 0; RH.streak++; RH.maxStreak = Math.max(RH.maxStreak, RH.streak); RH.score += pts(30); rhyLevel(levelOf(RH.streak)); heatCheck(); showJudge(dt < 0 ? TT("早了一点", "A bit early") : TT("晚了一点", "A bit late"), "late", dt); }   // 放对了但没踩准：照样算连击，只是分少
+    else { const m0 = multOf(RH.streak); RH[grade]++; RH.err = 0; RH.streak++; RH.maxStreak = Math.max(RH.maxStreak, RH.streak); RH.score += pts(grade === "perfect" ? 100 : 60); rhyLevel(levelOf(RH.streak));
       showJudge(grade === "perfect" ? TT("完美", "Perfect") : TT("不错", "Good"), grade, dt); rhyHit(grade); boom(lane, grade);
-      if (multOf(RH.streak) > m0) multUp(multOf(RH.streak)); }
+      if (multOf(RH.streak) > m0) multUp(multOf(RH.streak)); else heatCheck(); }
     beam(lane, grade === "late" ? "late" : "ok");
   } else {
     RH.wrongN++; RH.wrongs.push(q); save(); const broke = slip(); beam(lane, "bad"); flashLane(p.o.ans, "show");
@@ -260,11 +270,11 @@ function judge(p, lane, dt) {
   dropPill(p, lane, ok);
   hud(); labels();
 }
-function breakStreak() { const had = RH.streak; if (had > 0) RH.breaks = (RH.breaks || 0) + 1; RH.streak = 0; rhyLevel(levelOf(0)); hud(); if (had >= 5) { const c = RH.el.combo; if (c) { c.classList.remove("break"); void c.offsetWidth; c.classList.add("break"); } } }
+function breakStreak() { const had = RH.streak; if (had > 0) RH.breaks = (RH.breaks || 0) + 1; RH.streak = 0; rhyLevel(levelOf(0)); if (RH.heat) setHeat(RH.heat - 1); hud(); if (had >= 5) { const c = RH.el.combo; if (c) { c.classList.remove("break"); void c.offsetWidth; c.classList.add("break"); } } }
 function hud() {
   RH.el.score.textContent = RH.score; const m = multOf(RH.streak);
   RH.el.mult.textContent = "×" + m; RH.el.mult.parentElement.dataset.m = m;
-  RH.el.streak.textContent = TT(`连击 ${RH.streak}`, `Combo ${RH.streak}`);
+  RH.el.streak.textContent = TT(`连击 ${RH.streak}`, `Combo ${RH.streak}`) + (RH.heat ? ` · +${RH.heat * 10}%` : "");
   RH.el.cnt.textContent = `${RH.perfect} / ${RH.good} / ${RH.miss + RH.wrongN + RH.late}`;
   document.querySelector(".rh-game")?.setAttribute("data-lv", levelOf(RH.streak));
   const c = RH.el.combo; if (c) { c.textContent = RH.streak >= 2 ? RH.streak : ""; if (RH.streak >= 2) { c.classList.remove("pop", "break"); void c.offsetWidth; c.classList.add("pop"); } }
@@ -290,6 +300,22 @@ function multUp(m) {
   const g = document.querySelector(".rh-game"); if (!g) return;
   const f = document.createElement("div"); f.className = "rh-mup m" + m; f.innerHTML = `<b>×${m}</b><small>${TT(["", "", "音乐加入和弦", "旋律加入", "全开！"][m] || "", ["", "", "Chords join in", "Melody joins in", "Full band!"][m] || "")}</small>`;
   g.appendChild(f); setTimeout(() => f.remove(), 900); shakeGame(m >= 4 ? 6 : 4);
+}
+/* 热度：连击到门槛就升一级；已经最高级时每多 16 连击再庆祝一次（不再加分） */
+function heatCheck() {
+  const h = RH.heat || 0, n = RH.streak;
+  if (h < 3 && n >= HEAT_AT[h]) { setHeat(h + 1); heatUp(h + 1, false); }
+  else if (h === 3 && n > HEAT_AT[2] && (n - HEAT_AT[2]) % 16 === 0) heatUp(3, true);
+}
+function setHeat(h) { RH.heat = h; RH.maxHeat = Math.max(RH.maxHeat || 0, h); rhyHeat(h); RH.el.game?.setAttribute("data-heat", h); }
+function heatUp(h, again) {
+  rhyHeatHit(h);
+  if (fxLevel() === 0) return;
+  const g = RH.el.game; if (!g) return;
+  const f = document.createElement("div"); f.className = "rh-mup heat h" + h;
+  f.innerHTML = `<b>${esc(TT(HEAT_NAME[h][0], HEAT_NAME[h][1]))}</b><small>${again ? esc(TT(`连击 ${RH.streak}！`, `${RH.streak} combo!`)) : esc(TT(HEAT_SUB[h][0], HEAT_SUB[h][1]))}</small>`;
+  g.appendChild(f); setTimeout(() => f.remove(), 1300); shakeGame(4);
+  if (h >= 3 && fxLevel() >= 2) { const r = RH.el.belt.getBoundingClientRect(); for (let k = 0; k < 5; k++) setTimeout(() => FX.burst(r.left + r.width * (0.1 + k * 0.2), r.top + 6, k % 2 ? "cross" : "pill", 8), k * 70); }   // 顶部撒一次彩带
 }
 function shakeGame(px) {
   if (cfg.shake === 0 || fxLevel() < 2) return;
@@ -343,7 +369,7 @@ function drawWave() {
   const fl = rhyFloor(heardNow()), climax = fl >= 3; if (RH.el.game) RH.el.game.classList.toggle("hi", climax);
   /* 段落亮度：主歌 0.35、渐强 0.6、副歌 1；每帧只靠近一点点 → 约 1 秒的平滑过渡 */
   waveGlow += ((climax ? 1 : fl >= 2 ? 0.6 : 0.35) - waveGlow) * 0.03;
-  const col = climax ? "#ff9ff3" : "#7fe3ff", maxH = (L >= 3 ? 64 : 48) * (0.55 + waveGlow * 0.6), bins = waveBuf.length * 0.62;
+  const ht = RH.heat || 0, col = ht >= 3 ? `hsl(${(performance.now() / 50) % 360},85%,68%)` : ht >= 1 ? "#ffc94d" : climax ? "#ff9ff3" : "#7fe3ff", maxH = (L >= 3 ? 64 : 48) * (0.55 + waveGlow * 0.6), bins = waveBuf.length * 0.62;
   const val = k => { const x = waveBuf[Math.min(waveBuf.length - 1, Math.floor(k * bins))] / 255; return Math.pow(x, 1.25); };
   /* 1. 边缘光带：宽度和亮度只看段落，不跟拍子 */
   const depth = 18 + waveGlow * 40, ga = 0.06 + waveGlow * 0.16;
@@ -378,7 +404,9 @@ function drawEcg(bn) {
   const COL = { perfect: "#5fd6a8", good: "#7fe3ff", late: "#f4bf4f", wrong: "#ff6b81", miss: "#ff6b81" };
   g.lineWidth = 2; g.lineJoin = "round";
   const from = Math.floor(bn - 0.6), to = Math.ceil(bn + 4.4);
-  g.strokeStyle = "#7fe3ff55"; g.beginPath(); g.moveTo(0, mid);
+  if (RH.heat >= 3) { const hu = (performance.now() / 40) % 360, gr = g.createLinearGradient(0, 0, w, 0); for (let k = 0; k <= 4; k++) gr.addColorStop(k / 4, `hsla(${(hu + k * 70) % 360},90%,70%,.85)`); g.strokeStyle = gr; }   // 摇滚之神：心电条幻彩缓慢流动
+  else g.strokeStyle = RH.heat >= 1 ? "#ffc94d77" : "#7fe3ff55";
+  g.beginPath(); g.moveTo(0, mid);
   for (let b = from; b <= to; b++) {
     const x = mx + (b - bn) * span, big = hitSet.has(b);
     g.lineTo(x - span * 0.12, mid);
@@ -409,7 +437,7 @@ function finish(quit) {
   const timing = R.perfect + R.good, tot = R.answered || 1, wr = [...new Map(R.wrongs.map(q => [q.ref.drug.no, q])).values()];
   show(`<div class="result rh-res"><div class="eyebrow">${TT("摇滚医生", "Rock Doctor")} · ${TT(R.tr.level[0], R.tr.level[1])}</div><h2 style="font-size:30px">${quit ? TT("提前结束 · ", "Ended early · ") : ""}${esc(TT(R.tr.name[0], R.tr.name[1]))}</h2>
       <div class="score">${R.score}</div>${isBest ? `<div class="newbest">${TT("新纪录！", "New best!")}</div>` : `<div style="color:var(--faint);font-size:13px">${TT("最高", "Best")} ${prevBest}</div>`}
-      <div class="meta"><span>${TT("最高连击", "Max combo")} <b>${R.maxStreak}</b></span><span>${TT("放对", "Right")} <b>${R.correct}/${R.answered}</b></span><span>${TT("节奏准确率", "Timing")} <b>${Math.round(timing / tot * 100)}%</b></span>${done && !R.breaks && R.answered ? `<span class="rh-fc">${TT("全连！", "Full combo!")}</span>` : ""}</div>
+      <div class="meta"><span>${TT("最高连击", "Max combo")} <b>${R.maxStreak}</b></span>${R.maxHeat ? `<span>${TT("最高热度", "Top heat")} <b class="rh-heatb h${R.maxHeat}">${esc(TT(HEAT_NAME[R.maxHeat][0], HEAT_NAME[R.maxHeat][1]))}</b></span>` : ""}<span>${TT("放对", "Right")} <b>${R.correct}/${R.answered}</b></span><span>${TT("节奏准确率", "Timing")} <b>${Math.round(timing / tot * 100)}%</b></span>${done && !R.breaks && R.answered ? `<span class="rh-fc">${TT("全连！", "Full combo!")}</span>` : ""}</div>
       <p class="rh-res-x">${TT(`完美 ${R.perfect} · 不错 ${R.good} · 偏了 ${R.late} · 放错 ${R.wrongN} · 漏 ${R.miss} · 空拍 ${R.offb}`, `Perfect ${R.perfect} · Good ${R.good} · Off-time ${R.late} · Wrong ${R.wrongN} · Miss ${R.miss} · Off-beat ${R.offb}`)}</p>
       ${got.length ? `<div class="rh-newach"><b>${TT("解锁新成就", "New achievements")}</b>${got.map(a => `<span>★ ${esc(achName(a))}<small>${esc(achDesc(a))}</small></span>`).join("")}</div>` : ""}
       ${wr.length ? `<details class="rh-wr"><summary>${TT(`放错的药（${wr.length}）· 只是给你看看，不记进错题本`, `Drugs you misplaced (${wr.length}) · for reference only, not saved`)}</summary>${wr.map(q => `<div><b>${esc(q.ref.drug.en)}</b> ${esc(zhAlt(q.ref.drug))} → ${esc(q.options[q.ans])}</div>`).join("")}</details>` : ""}
